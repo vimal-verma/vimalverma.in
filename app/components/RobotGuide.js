@@ -43,12 +43,33 @@ const Mouth = ({ expression }) => {
     return <path id="Vector_9" d="M70.5 119.5C73.8137 119.5 76.5 116.814 76.5 113.5C76.5 110.186 73.8137 107.5 70.5 107.5C67.1863 107.5 64.5 110.186 64.5 113.5C64.5 116.814 67.1863 119.5 70.5 119.5Z" stroke="#00F2FF" strokeWidth="2" />;
 };
 
-const RobotIcon = ({ expression, isSpeaking }) => {
+const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, isSpinning }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
     return (
-        <svg width="148" height="141" viewBox="0 0 148 141" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg
+            width="80" height="76" viewBox="0 0 148 141" fill="none" xmlns="http://www.w3.org/2000/svg"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={onRobotClick}
+            style={{
+                filter: isHovered ? "drop-shadow(0px 0px 15px #00F2FF)" : "drop-shadow(0px 4px 8px rgba(0,0,0,0.15))",
+                pointerEvents: "auto",
+                cursor: "pointer",
+                transition: "filter 0.3s ease, transform 0.6s ease",
+                transform: isSpinning ? "rotate(360deg)" : "rotate(0deg)",
+                transformOrigin: "center"
+            }}
+        >
+            <defs>
+                <linearGradient id="bodyGradient" x1="70.5" y1="0.5" x2="70.5" y2="140.5" gradientUnits="userSpaceOnUse">
+                    <stop stopColor={isDark ? "#FFFFFF" : "#4A4A4A"} />
+                    <stop offset="1" stopColor={isDark ? "#E0E0E0" : "#2A2A2A"} />
+                </linearGradient>
+            </defs>
             <g id="robot">
-                <path id="circle" d="M70.5 140.5C109.16 140.5 140.5 109.16 140.5 70.5C140.5 31.8401 109.16 0.5 70.5 0.5C31.8401 0.5 0.5 31.8401 0.5 70.5C0.5 109.16 31.8401 140.5 70.5 140.5Z" fill="#F0F0F0" stroke="#E0E0E0" />
-                <path id="squre" d="M95.5 40.5H45.5C34.4543 40.5 25.5 49.4543 25.5 60.5V80.5C25.5 91.5457 34.4543 100.5 45.5 100.5H95.5C106.546 100.5 115.5 91.5457 115.5 80.5V60.5C115.5 49.4543 106.546 40.5 95.5 40.5Z" fill="#1A1A1A" />
+                <path id="circle" d="M70.5 140.5C109.16 140.5 140.5 109.16 140.5 70.5C140.5 31.8401 109.16 0.5 70.5 0.5C31.8401 0.5 0.5 31.8401 0.5 70.5C0.5 109.16 31.8401 140.5 70.5 140.5Z" fill="url(#bodyGradient)" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} />
+                <path id="squre" d="M95.5 40.5H45.5C34.4543 40.5 25.5 49.4543 25.5 60.5V80.5C25.5 91.5457 34.4543 100.5 45.5 100.5H95.5C106.546 100.5 115.5 91.5457 115.5 80.5V60.5C115.5 49.4543 106.546 40.5 95.5 40.5Z" fill={isDark ? "#1A1A1A" : "#F0F0F0"} />
             </g>
             <Eyes expression={expression} />
             <Mouth expression={expression} />
@@ -56,10 +77,19 @@ const RobotIcon = ({ expression, isSpeaking }) => {
     );
 };
 
-export default function RobotGuide() {
-    const [position, setPosition] = useState({ x: -100, y: -100 });
+export default function RobotGuide({ isDark }) {
+    const containerRef = useRef(null);
+    const currentUtteranceRef = useRef(null);
+    const mousePos = useRef({ x: -100, y: -100 });
+    const currentPos = useRef({ x: -100, y: -100 });
+    const visitedSections = useRef(new Set());
+    const allSectionsRef = useRef([]);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [expression, setExpression] = useState("happy");
+    const [spokenText, setSpokenText] = useState("");
+    const [hasStarted, setHasStarted] = useState(false);
+    const [isSpinning, setIsSpinning] = useState(false);
+    const [isDocked, setIsDocked] = useState(false);
     const lastSpokenRef = useRef("");
     const timeoutRef = useRef(null);
     const idleTimeoutRef = useRef(null);
@@ -67,27 +97,78 @@ export default function RobotGuide() {
 
     useEffect(() => {
         const speak = (text) => {
+            if (!hasStarted) return;
             if (typeof window !== "undefined" && window.speechSynthesis) {
                 window.speechSynthesis.cancel(); // Stop previous speech
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 1.1; // Slightly faster
-                utterance.pitch = 1.2; // Robot-like pitch
+                currentUtteranceRef.current = utterance;
+
+                // Select a more human-sounding voice if available
+                const voices = window.speechSynthesis.getVoices();
+                const preferredVoice = voices.find(voice =>
+                    (voice.name.includes("Google") && voice.lang.includes("en")) ||
+                    (voice.name.includes("Natural") && voice.lang.includes("en"))
+                );
+                if (preferredVoice) utterance.voice = preferredVoice;
+
+                utterance.rate = 1.0; // Natural speed
+                utterance.pitch = 1.0; // Natural pitch
                 utterance.onstart = () => {
                     setIsSpeaking(true);
                     isSpeakingRef.current = true;
+                    setSpokenText(text);
                 };
                 utterance.onend = () => {
-                    setIsSpeaking(false);
-                    isSpeakingRef.current = false;
-                    setExpression("happy");
+                    if (currentUtteranceRef.current === utterance) {
+                        setIsSpeaking(false);
+                        isSpeakingRef.current = false;
+                        setExpression("happy");
+                        setSpokenText("");
+                    }
                 };
                 window.speechSynthesis.speak(utterance);
             }
         };
 
+        // Find all sections on mount
+        allSectionsRef.current = Array.from(document.querySelectorAll('[data-section]'))
+            .map(el => el.getAttribute('data-section'));
+
+        // Animation Loop for smooth movement (Lerp)
+        let animationFrameId;
+        const renderLoop = () => {
+            let targetX = mousePos.current.x;
+            let targetY = mousePos.current.y;
+
+            if (isDocked && typeof window !== "undefined") {
+                targetX = window.innerWidth - 100;
+                targetY = 100;
+            }
+
+            // Linear interpolation for smooth delay (0.1 = 10% catch-up per frame)
+            currentPos.current.x += (targetX - currentPos.current.x) * 0.1;
+            currentPos.current.y += (targetY - currentPos.current.y) * 0.1;
+
+            if (containerRef.current) {
+                // Center the robot (80x76) around the cursor
+                containerRef.current.style.transform = `translate(${currentPos.current.x - 40}px, ${currentPos.current.y - 38}px)`;
+            }
+            animationFrameId = requestAnimationFrame(renderLoop);
+        };
+        renderLoop();
+
         const checkUnderCursor = (x, y) => {
-            const element = document.elementFromPoint(x, y);
+            // Use elementsFromPoint to look through the robot (which might be under the cursor)
+            const elements = document.elementsFromPoint(x, y);
+            const element = elements.find(el => !containerRef.current?.contains(el) && el !== containerRef.current);
+
             if (!element) return;
+
+            // Track visited sections
+            const sectionEl = element.closest('[data-section]');
+            if (sectionEl) {
+                visitedSections.current.add(sectionEl.getAttribute('data-section'));
+            }
 
             // Interactive check (Excited when hovering links/buttons)
             const isInteractive = element.closest("a") || element.closest("button");
@@ -96,6 +177,8 @@ export default function RobotGuide() {
             } else if (!isSpeakingRef.current) {
                 setExpression((prev) => (prev === "sleepy" ? "sleepy" : "happy"));
             }
+
+            if (!hasStarted) return;
 
             // Find closest parent with data-narrate attribute
             const narratable = element.closest("[data-narrate]");
@@ -109,10 +192,12 @@ export default function RobotGuide() {
             }
         };
         // Initial greeting
-        speak("Hello! I am your robot guide. Move me around to explore Vimal's portfolio.");
+        if (hasStarted) {
+            speak("Hello! I am your robot guide. Move me around to explore Vimal's portfolio.");
+        }
 
         const updatePosition = (e) => {
-            setPosition({ x: e.clientX, y: e.clientY });
+            mousePos.current = { x: e.clientX, y: e.clientY };
 
             // Idle Logic: Sleep if no movement for 4 seconds
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
@@ -132,19 +217,139 @@ export default function RobotGuide() {
         window.addEventListener("mousemove", updatePosition);
         return () => {
             window.removeEventListener("mousemove", updatePosition);
+            cancelAnimationFrame(animationFrameId);
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
             if (typeof window !== "undefined" && window.speechSynthesis) {
                 window.speechSynthesis.cancel();
             }
         };
-    }, []);
+    }, [hasStarted, isDocked]);
 
+    const stopSpeaking = () => {
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+            isSpeakingRef.current = false;
+            setSpokenText("");
+            currentUtteranceRef.current = null;
+        }
+    };
+
+    const handleRobotClick = () => {
+        if (!isSpinning) {
+            setIsSpinning(true);
+            setTimeout(() => setIsSpinning(false), 600);
+        }
+    };
 
 
     return (
-        <div style={{ position: "fixed", left: 0, top: 0, transform: `translate(${position.x}px, ${position.y}px)`, pointerEvents: "none", zIndex: 9999, transition: "transform 0.05s linear", marginTop: "10px", marginLeft: "10px" }}>
-            <RobotIcon expression={expression} isSpeaking={isSpeaking} />
-        </div>
+        <>
+            {!hasStarted && (
+                <button
+                    onClick={() => setHasStarted(true)}
+                    style={{
+                        position: "fixed",
+                        bottom: "30px",
+                        right: "30px",
+                        padding: "12px 24px",
+                        fontSize: "16px",
+                        backgroundColor: "#00F2FF",
+                        color: "#1A1A1A",
+                        border: "none",
+                        borderRadius: "30px",
+                        cursor: "pointer",
+                        zIndex: 10000,
+                        fontWeight: "bold",
+                        boxShadow: "0 0 20px rgba(0, 242, 255, 0.5)",
+                        pointerEvents: "auto",
+                    }}
+                >
+                    Start Tour
+                </button>
+            )}
+            {hasStarted && isSpeaking && (
+                <button
+                    onClick={stopSpeaking}
+                    style={{
+                        position: "fixed",
+                        bottom: "30px",
+                        right: "30px",
+                        padding: "12px 24px",
+                        fontSize: "16px",
+                        backgroundColor: "#FF4444",
+                        color: "#FFFFFF",
+                        border: "none",
+                        borderRadius: "30px",
+                        cursor: "pointer",
+                        zIndex: 10000,
+                        fontWeight: "bold",
+                        boxShadow: "0 0 20px rgba(255, 68, 68, 0.5)",
+                        pointerEvents: "auto",
+                    }}
+                >
+                    Stop Speaking
+                </button>
+            )}
+            {hasStarted && (
+                <button
+                    onClick={() => setIsDocked(!isDocked)}
+                    style={{
+                        position: "fixed",
+                        bottom: "30px",
+                        left: "30px",
+                        padding: "12px 24px",
+                        fontSize: "16px",
+                        backgroundColor: "#00F2FF",
+                        color: "#1A1A1A",
+                        border: "none",
+                        borderRadius: "30px",
+                        cursor: "pointer",
+                        zIndex: 10000,
+                        fontWeight: "bold",
+                        boxShadow: "0 0 20px rgba(0, 242, 255, 0.5)",
+                        pointerEvents: "auto",
+                    }}
+                >
+                    {isDocked ? "Undock" : "Dock"}
+                </button>
+            )}
+            <div ref={containerRef} style={{ position: "fixed", left: 0, top: 0, pointerEvents: "none", zIndex: 9999 }}>
+                {spokenText && (
+                    <div style={{
+                        position: "absolute",
+                        bottom: "100%",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        marginBottom: "15px",
+                        backgroundColor: isDark ? "rgba(30, 30, 30, 0.95)" : "rgba(255, 255, 255, 0.95)",
+                        color: isDark ? "#fff" : "#000",
+                        padding: "12px",
+                        borderRadius: "12px",
+                        border: "1px solid #00F2FF",
+                        boxShadow: "0 4px 15px rgba(0, 242, 255, 0.2)",
+                        width: "220px",
+                        textAlign: "center",
+                        fontSize: "14px",
+                        lineHeight: "1.4",
+                        pointerEvents: "none",
+                        backdropFilter: "blur(5px)"
+                    }}>
+                        {spokenText}
+                        <div style={{
+                            position: "absolute",
+                            top: "100%",
+                            left: "50%",
+                            marginLeft: "-6px",
+                            borderWidth: "6px",
+                            borderStyle: "solid",
+                            borderColor: `${isDark ? "rgba(30, 30, 30, 0.95)" : "rgba(255, 255, 255, 0.95)"} transparent transparent transparent`
+                        }}></div>
+                    </div>
+                )}
+                <RobotIcon expression={expression} isSpeaking={isSpeaking} isDark={isDark} onRobotClick={handleRobotClick} isSpinning={isSpinning} />
+            </div>
+        </>
     );
 }

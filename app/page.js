@@ -26,11 +26,11 @@ export default function Home() {
   ];
 
   return (
-    <div className={`${styles.page} ${isDark ? styles.darkMode : ""}`} style={{ cursor: "none" }}>
-      <RobotGuide />
+    <div className={`${styles.page} ${isDark ? styles.darkMode : ""}`}>
+      <RobotGuide isDark={isDark} />
       <Header isDark={isDark} toggleTheme={toggleTheme} setIsDark={setIsDark} />
       <main className={styles.main}>
-        <div className={styles.hero} data-narrate="This is the hero section. Vimal is a Software Developer and Web App Creator.">
+        <div className={styles.hero} data-narrate="This is the hero section. Vimal is a Software Developer and Web App Creator." data-section="Introduction">
           <h1 className={styles.title}>
             Vimal Kumar <span className={styles.handle}>(VimalVerma)</span>
           </h1>
@@ -51,7 +51,7 @@ export default function Home() {
           </a>
         </div>
 
-        <div className={styles.skillsSection} data-narrate="Here are the skills and technologies Vimal works with, like React, Next JS, and Node JS.">
+        <div className={styles.skillsSection} data-narrate="Here are the skills and technologies Vimal works with, like React, Next JS, and Node JS." data-section="Skills">
           <h2>Skills & Technologies</h2>
           <div className={styles.skillsList}>
             {skills.map((skill) => (
@@ -62,7 +62,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={styles.projectsSection} data-narrate="These are some of the projects built by Vimal. Hover over them to learn more.">
+        <div className={styles.projectsSection} data-narrate="These are some of the projects built by Vimal. Hover over them to learn more." data-section="Projects">
           <h2>My Projects</h2>
           <div className={styles.grid}>
             {[
