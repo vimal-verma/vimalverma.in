@@ -1,66 +1,88 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
 import styles from "./page.module.css";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 export default function Home() {
+  const [isDark, setIsDark] = useState(null);
+
+  const toggleTheme = () => {
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    localStorage.setItem("theme", newTheme ? "dark" : "light");
+  };
+
+  const skills = [
+    "JavaScript",
+    "React",
+    "Next.js",
+    "Node.js",
+    "HTML5 & CSS3",
+    "Git & GitHub",
+    "NFC Technology",
+    "Web APIs",
+  ];
+
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${isDark ? styles.darkMode : ""}`}>
+      <Header isDark={isDark} toggleTheme={toggleTheme} setIsDark={setIsDark} />
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+        <div className={styles.hero}>
+          <h1 className={styles.title}>
+            Vimal Kumar <span className={styles.handle}>(VimalVerma)</span>
+          </h1>
+          <p className={styles.subtitle}>
+            Software Developer | Web App Creator
           </p>
+          <p className={styles.description}>
+            I love to build web apps. I have built multiple apps like NFCBuzz.com, WebNfc.org, KnowBihar.in, Vdev.in and more.
+          </p>
+          <a
+            href="/resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.ctaButton}
+          >
+            Download Resume
+          </a>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className={styles.skillsSection}>
+          <h2>Skills & Technologies</h2>
+          <div className={styles.skillsList}>
+            {skills.map((skill) => (
+              <span key={skill} className={styles.skillBadge}>
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.projectsSection}>
+          <h2>My Projects</h2>
+          <div className={styles.grid}>
+            {[
+              { name: "NFCBuzz.com", url: "https://nfcbuzz.com", desc: "Explore NFC technology." },
+              { name: "WebNfc.org", url: "https://webnfc.org", desc: "Web NFC resources." },
+              { name: "KnowBihar.in", url: "https://knowbihar.in", desc: "Insights about Bihar." },
+              { name: "Vdev.in", url: "https://vdev.in", desc: "My personal development hub." },
+            ].map((project) => (
+              <a
+                key={project.name}
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.card}
+              >
+                <h3>{project.name} &rarr;</h3>
+                <p>{project.desc}</p>
+              </a>
+            ))}
+          </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
