@@ -3,6 +3,7 @@ import { useState } from "react";
 import styles from "./page.module.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import RobotGuide from "./components/RobotGuide";
 
 export default function Home() {
   const [isDark, setIsDark] = useState(null);
@@ -25,10 +26,11 @@ export default function Home() {
   ];
 
   return (
-    <div className={`${styles.page} ${isDark ? styles.darkMode : ""}`}>
+    <div className={`${styles.page} ${isDark ? styles.darkMode : ""}`} style={{ cursor: "none" }}>
+      <RobotGuide />
       <Header isDark={isDark} toggleTheme={toggleTheme} setIsDark={setIsDark} />
       <main className={styles.main}>
-        <div className={styles.hero}>
+        <div className={styles.hero} data-narrate="This is the hero section. Vimal is a Software Developer and Web App Creator.">
           <h1 className={styles.title}>
             Vimal Kumar <span className={styles.handle}>(VimalVerma)</span>
           </h1>
@@ -43,12 +45,13 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             className={styles.ctaButton}
+            data-narrate="Click here to download the resume."
           >
             Download Resume
           </a>
         </div>
 
-        <div className={styles.skillsSection}>
+        <div className={styles.skillsSection} data-narrate="Here are the skills and technologies Vimal works with, like React, Next JS, and Node JS.">
           <h2>Skills & Technologies</h2>
           <div className={styles.skillsList}>
             {skills.map((skill) => (
@@ -59,7 +62,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={styles.projectsSection}>
+        <div className={styles.projectsSection} data-narrate="These are some of the projects built by Vimal. Hover over them to learn more.">
           <h2>My Projects</h2>
           <div className={styles.grid}>
             {[
@@ -74,6 +77,7 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.card}
+                data-narrate={`Project: ${project.name}. ${project.desc}`}
               >
                 <h3>{project.name} &rarr;</h3>
                 <p>{project.desc}</p>
