@@ -5,7 +5,13 @@ const strokeColor = "#333";
 const faceColor = "#fff";
 
 // Eyes
-const Eyes = ({ expression }) => {
+const Eyes = ({ expression, isBlinking, eyeOffset = { x: 0, y: 0 } }) => {
+    if (isBlinking) return (
+        <g>
+            <path d="M42 72 Q50 76 58 72" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M82 72 Q90 76 98 72" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />
+        </g>
+    );
     if (expression === "excited") return (
         <g>
             <path id="Vector" d="M50.5 55.5L53.5 63.5H62.5L55.5 69.5L58.5 77.5L50.5 72.5L42.5 77.5L45.5 69.5L38.5 63.5H47.5L50.5 55.5Z" fill="#00F2FF" />
@@ -20,7 +26,13 @@ const Eyes = ({ expression }) => {
         <path id="Vector_10" d="M40.5 70.5C47.1667 63.8333 53.8333 63.8333 60.5 70.5" stroke="#00F2FF" strokeWidth="4" strokeLinecap="round" />
         <path id="Vector_11" d="M80.5 70.5C87.1667 63.8333 93.8333 63.8333 100.5 70.5" stroke="#00F2FF" strokeWidth="4" strokeLinecap="round" />
     </g>);
-    return <g>
+    if (expression === "confused") return (
+        <g style={{ transform: `translate(${eyeOffset.x}px, ${eyeOffset.y}px)` }}>
+            <path d="M42 68 Q50 60 58 68" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M82 72 Q90 76 98 72" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />
+        </g>
+    );
+    return <g style={{ transform: `translate(${eyeOffset.x}px, ${eyeOffset.y}px)` }}>
         <path id="Vector_7" d="M50.5 78.5C54.9183 78.5 58.5 74.9183 58.5 70.5C58.5 66.0817 54.9183 62.5 50.5 62.5C46.0817 62.5 42.5 66.0817 42.5 70.5C42.5 74.9183 46.0817 78.5 50.5 78.5Z" fill="#00F2FF" />
         <path id="Vector_8" d="M90.5 78.5C94.9183 78.5 98.5 74.9183 98.5 70.5C98.5 66.0817 94.9183 62.5 90.5 62.5C86.0817 62.5 82.5 66.0817 82.5 70.5C82.5 74.9183 86.0817 78.5 90.5 78.5Z" fill="#00F2FF" />
     </g>;
@@ -40,25 +52,29 @@ const Mouth = ({ expression }) => {
     if (expression === "happy") return <path id="Vector_6" d="M55.5 110.5C65.5 117.167 75.5 117.167 85.5 110.5" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" />;
     if (expression === "sleepy") return <path id="Zzz" d="M111.608 34.5V32.6747L118.866 22.4901H111.594V19.9545H122.73V21.7798L115.464 31.9645H122.744V34.5H111.608ZM124.99 34.5V32.696L130.331 26.0838V26.0057H125.175V23.5909H133.975V25.5582L128.961 32.0071V32.0852H134.159V34.5H124.99ZM136.416 34.5V32.696L141.757 26.0838V26.0057H136.601V23.5909H145.401V25.5582L140.386 32.0071V32.0852H145.585V34.5H136.416Z" fill="#00F2FF" />;
     if (expression === "excited") return <path id="Vector_3" d="M55.5 110.5L62.5 103.5L70.5 110.5L78.5 103.5L85.5 110.5" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" />;
+    if (expression === "confused") return <path d="M65 112 Q72 108 80 112 T95 112" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />;
     return <path id="Vector_9" d="M70.5 119.5C73.8137 119.5 76.5 116.814 76.5 113.5C76.5 110.186 73.8137 107.5 70.5 107.5C67.1863 107.5 64.5 110.186 64.5 113.5C64.5 116.814 67.1863 119.5 70.5 119.5Z" stroke="#00F2FF" strokeWidth="2" />;
 };
 
-const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, isSpinning }) => {
+const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDoubleClick, onMouseDown, isSpinning, isBlinking, eyeOffset, isWiggling, isDancing, isMoving }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
         <svg
-            width="80" height="76" viewBox="0 0 148 141" fill="none" xmlns="http://www.w3.org/2000/svg"
+            width="100" height="100" viewBox="-20 -25 188 195" fill="none" xmlns="http://www.w3.org/2000/svg"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={onRobotClick}
+            onMouseDown={onMouseDown}
+            onDoubleClick={onRobotDoubleClick}
             style={{
                 filter: isHovered ? "drop-shadow(0px 0px 15px #00F2FF)" : "drop-shadow(0px 4px 8px rgba(0,0,0,0.15))",
                 pointerEvents: "auto",
                 cursor: "pointer",
                 transition: "filter 0.3s ease, transform 0.6s ease",
                 transform: isSpinning ? "rotate(360deg)" : "rotate(0deg)",
-                transformOrigin: "center"
+                transformOrigin: "center",
+                animation: isDancing ? "dance 0.6s ease-in-out infinite" : (isMoving ? "fly 1s ease-in-out infinite" : "none")
             }}
         >
             <defs>
@@ -67,12 +83,36 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, isSpinning })
                     <stop offset="1" stopColor={isDark ? "#E0E0E0" : "#2A2A2A"} />
                 </linearGradient>
             </defs>
-            <g id="robot">
-                <path id="circle" d="M70.5 140.5C109.16 140.5 140.5 109.16 140.5 70.5C140.5 31.8401 109.16 0.5 70.5 0.5C31.8401 0.5 0.5 31.8401 0.5 70.5C0.5 109.16 31.8401 140.5 70.5 140.5Z" fill="url(#bodyGradient)" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} />
-                <path id="squre" d="M95.5 40.5H45.5C34.4543 40.5 25.5 49.4543 25.5 60.5V80.5C25.5 91.5457 34.4543 100.5 45.5 100.5H95.5C106.546 100.5 115.5 91.5457 115.5 80.5V60.5C115.5 49.4543 106.546 40.5 95.5 40.5Z" fill={isDark ? "#1A1A1A" : "#F0F0F0"} />
+            <g style={{ animation: isDancing ? "rainbow 2s linear infinite" : "none" }}>
+                <g id="robot">
+                    {/* Antenna */}
+                    <g style={{ transformOrigin: "70.5px 0px", animation: isWiggling ? "wiggle 0.5s ease-in-out infinite" : "none" }}>
+                        <line x1="70.5" y1="0" x2="70.5" y2="-20" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="4" strokeLinecap="round" />
+                        <circle cx="70.5" cy="-20" r="5" fill="#FF4444" />
+                    </g>
+                    {/* Legs */}
+                    <g style={{ transformOrigin: "50px 130px", transform: isMoving ? "rotate(25deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
+                        <path d="M50 130 V160 H40" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    </g>
+                    <g style={{ transformOrigin: "98px 130px", transform: isMoving ? "rotate(25deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
+                        <path d="M98 130 V160 H108" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    </g>
+                    {/* Jetpack Flame */}
+                    {isMoving && (
+                        <g style={{ animation: "flicker 0.1s infinite alternate" }}>
+                            <path d="M60 160 Q70 190 80 160" fill="#FF9900" opacity="0.8" />
+                            <path d="M65 160 Q70 180 75 160" fill="#FFFF00" opacity="0.9" />
+                        </g>
+                    )}
+                    {/* Arms */}
+                    <path d="M10 80 Q-10 100 10 120" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
+                    <path d="M138 80 Q158 100 138 120" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" style={{ transformOrigin: "138px 80px", animation: isHovered ? "wave 1s ease-in-out infinite" : "none" }} />
+                    <path id="circle" d="M70.5 140.5C109.16 140.5 140.5 109.16 140.5 70.5C140.5 31.8401 109.16 0.5 70.5 0.5C31.8401 0.5 0.5 31.8401 0.5 70.5C0.5 109.16 31.8401 140.5 70.5 140.5Z" fill="url(#bodyGradient)" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} />
+                    <path id="squre" d="M95.5 40.5H45.5C34.4543 40.5 25.5 49.4543 25.5 60.5V80.5C25.5 91.5457 34.4543 100.5 45.5 100.5H95.5C106.546 100.5 115.5 91.5457 115.5 80.5V60.5C115.5 49.4543 106.546 40.5 95.5 40.5Z" fill={isDark ? "#1A1A1A" : "#F0F0F0"} />
+                </g>
+                <Eyes expression={expression} isBlinking={isBlinking} eyeOffset={eyeOffset} />
+                <Mouth expression={expression} />
             </g>
-            <Eyes expression={expression} />
-            <Mouth expression={expression} />
         </svg>
     );
 };
@@ -80,26 +120,50 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, isSpinning })
 export default function RobotGuide({ isDark }) {
     const containerRef = useRef(null);
     const currentUtteranceRef = useRef(null);
-    const mousePos = useRef({ x: -100, y: -100 });
-    const currentPos = useRef({ x: -100, y: -100 });
     const visitedSections = useRef(new Set());
     const allSectionsRef = useRef([]);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [expression, setExpression] = useState("happy");
     const [spokenText, setSpokenText] = useState("");
-    const [hasStarted, setHasStarted] = useState(false);
+    const [displayedText, setDisplayedText] = useState("");
+    const [hasStarted, setHasStarted] = useState(true);
+    const [isSoundEnabled, setIsSoundEnabled] = useState(false);
     const [isSpinning, setIsSpinning] = useState(false);
-    const [isDocked, setIsDocked] = useState(false);
+    const [isBlinking, setIsBlinking] = useState(false);
+    const [isWiggling, setIsWiggling] = useState(false);
+    const [isDancing, setIsDancing] = useState(false);
+    const [isMoving, setIsMoving] = useState(false);
+    const [footprints, setFootprints] = useState([]);
+    const [eyeOffset, setEyeOffset] = useState({ x: 0, y: 0 });
+    const [robotPosition, setRobotPosition] = useState({ position: "fixed", right: "20px", top: "50px" });
+    const currentSectionRef = useRef(null);
+    const highlightedElementRef = useRef(null);
     const lastSpokenRef = useRef("");
     const timeoutRef = useRef(null);
     const idleTimeoutRef = useRef(null);
     const isSpeakingRef = useRef(false);
+    const lastMouseXRef = useRef(0);
+    const lastDirectionRef = useRef(0);
+    const shakeCountRef = useRef(0);
+    const lastShakeTimeRef = useRef(0);
+    const confusedTimeoutRef = useRef(null);
+    const moveTimeoutRef = useRef(null);
+    const scrollTimeoutRef = useRef(null);
+    const isDraggingRef = useRef(false);
+    const speechTimeoutRef = useRef(null);
 
-    useEffect(() => {
-        const speak = (text) => {
-            if (!hasStarted) return;
-            if (typeof window !== "undefined" && window.speechSynthesis) {
-                window.speechSynthesis.cancel(); // Stop previous speech
+    const speak = (text) => {
+        if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
+
+        setDisplayedText("");
+        setIsSpeaking(true);
+        isSpeakingRef.current = true;
+        setSpokenText(text);
+
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel(); // Stop previous speech
+
+            if (isSoundEnabled) {
                 const utterance = new SpeechSynthesisUtterance(text);
                 currentUtteranceRef.current = utterance;
 
@@ -116,7 +180,6 @@ export default function RobotGuide({ isDark }) {
                 utterance.onstart = () => {
                     setIsSpeaking(true);
                     isSpeakingRef.current = true;
-                    setSpokenText(text);
                 };
                 utterance.onend = () => {
                     if (currentUtteranceRef.current === utterance) {
@@ -127,35 +190,125 @@ export default function RobotGuide({ isDark }) {
                     }
                 };
                 window.speechSynthesis.speak(utterance);
+            } else {
+                // Fallback for text-only mode
+                const duration = Math.max(2000, text.split(" ").length * 300);
+                speechTimeoutRef.current = setTimeout(() => {
+                    setIsSpeaking(false);
+                    isSpeakingRef.current = false;
+                    setExpression("happy");
+                    setSpokenText("");
+                }, duration);
+            }
+        }
+    };
+
+    useEffect(() => {
+        const handleSectionClick = (e) => {
+            if (hasStarted && e.target.closest('[data-section]')) {
+                setExpression("excited");
             }
         };
+        window.addEventListener("click", handleSectionClick);
+        return () => window.removeEventListener("click", handleSectionClick);
+    }, [hasStarted]);
 
+    useEffect(() => {
+        const blinkInterval = setInterval(() => {
+            setIsBlinking(true);
+            setTimeout(() => setIsBlinking(false), 200);
+        }, 4000);
+        return () => clearInterval(blinkInterval);
+    }, []);
+
+    useEffect(() => {
+        const wiggleInterval = setInterval(() => {
+            if (Math.random() > 0.7) {
+                setIsWiggling(true);
+                setTimeout(() => setIsWiggling(false), 1000);
+            }
+        }, 3000);
+        return () => clearInterval(wiggleInterval);
+    }, []);
+
+    useEffect(() => {
+        setDisplayedText("");
+        if (!spokenText) return;
+
+        let i = 0;
+        const timer = setInterval(() => {
+            if (i < spokenText.length) {
+                setDisplayedText(spokenText.slice(0, i + 1));
+                i++;
+            } else {
+                clearInterval(timer);
+            }
+        }, 30);
+
+        return () => clearInterval(timer);
+    }, [spokenText]);
+
+    useEffect(() => {
+        speak("Hello! I am your robot guide. Move me around to explore Vimal's portfolio.");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        let interval;
+        if (isMoving) {
+            interval = setInterval(() => {
+                if (containerRef.current) {
+                    const rect = containerRef.current.getBoundingClientRect();
+                    const x = rect.left + rect.width / 2 + window.scrollX;
+                    const y = rect.bottom + window.scrollY - 30;
+                    setFootprints(prev => [...prev, { x, y, id: Date.now() }].slice(-20)); // Keep last 20
+                }
+            }, 100);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [isMoving]);
+
+    useEffect(() => {
         // Find all sections on mount
         allSectionsRef.current = Array.from(document.querySelectorAll('[data-section]'))
             .map(el => el.getAttribute('data-section'));
 
-        // Animation Loop for smooth movement (Lerp)
-        let animationFrameId;
-        const renderLoop = () => {
-            let targetX = mousePos.current.x;
-            let targetY = mousePos.current.y;
+        const activateSection = (sectionEl) => {
+            const sectionId = sectionEl.getAttribute('data-section');
 
-            if (isDocked && typeof window !== "undefined") {
-                targetX = window.innerWidth - 100;
-                targetY = 100;
+            if (sectionId && sectionId !== currentSectionRef.current) {
+                if (highlightedElementRef.current) {
+                    highlightedElementRef.current.style.outline = "";
+                    highlightedElementRef.current.style.boxShadow = "";
+                }
+                currentSectionRef.current = sectionId;
+                highlightedElementRef.current = sectionEl;
+                sectionEl.style.outline = "2px solid #00F2FF";
+                sectionEl.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.3)";
+
+                const rect = sectionEl.getBoundingClientRect();
+                setRobotPosition({
+                    position: "absolute",
+                    top: `${rect.top + window.scrollY - 75}px`,
+                    left: `${rect.right + window.scrollX - 100}px`,
+                    transition: "all 1s ease-in-out"
+                });
+
+                if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
+                setIsMoving(true);
+                moveTimeoutRef.current = setTimeout(() => setIsMoving(false), 1000);
             }
 
-            // Linear interpolation for smooth delay (0.1 = 10% catch-up per frame)
-            currentPos.current.x += (targetX - currentPos.current.x) * 0.1;
-            currentPos.current.y += (targetY - currentPos.current.y) * 0.1;
-
-            if (containerRef.current) {
-                // Center the robot (80x76) around the cursor
-                containerRef.current.style.transform = `translate(${currentPos.current.x - 40}px, ${currentPos.current.y - 38}px)`;
+            if (sectionId && !visitedSections.current.has(sectionId)) {
+                visitedSections.current.add(sectionId);
+                if (allSectionsRef.current.length > 0 && visitedSections.current.size === allSectionsRef.current.length) {
+                    speak("You have explored all sections! Thanks for visiting.");
+                    setExpression("excited");
+                }
             }
-            animationFrameId = requestAnimationFrame(renderLoop);
         };
-        renderLoop();
 
         const checkUnderCursor = (x, y) => {
             // Use elementsFromPoint to look through the robot (which might be under the cursor)
@@ -164,21 +317,24 @@ export default function RobotGuide({ isDark }) {
 
             if (!element) return;
 
-            // Track visited sections
-            const sectionEl = element.closest('[data-section]');
-            if (sectionEl) {
-                visitedSections.current.add(sectionEl.getAttribute('data-section'));
-            }
-
             // Interactive check (Excited when hovering links/buttons)
             const isInteractive = element.closest("a") || element.closest("button");
             if (isInteractive && !isSpeakingRef.current) {
                 setExpression("excited");
             } else if (!isSpeakingRef.current) {
-                setExpression((prev) => (prev === "sleepy" ? "sleepy" : "happy"));
+                setExpression((prev) => {
+                    if (prev === "confused") return prev;
+                    return prev === "sleepy" ? "sleepy" : "happy";
+                });
             }
 
             if (!hasStarted) return;
+
+            // Track visited sections
+            const sectionEl = element.closest('[data-section]');
+            if (sectionEl) {
+                activateSection(sectionEl);
+            }
 
             // Find closest parent with data-narrate attribute
             const narratable = element.closest("[data-narrate]");
@@ -191,17 +347,42 @@ export default function RobotGuide({ isDark }) {
                 }
             }
         };
-        // Initial greeting
-        if (hasStarted) {
-            speak("Hello! I am your robot guide. Move me around to explore Vimal's portfolio.");
-        }
 
         const updatePosition = (e) => {
-            mousePos.current = { x: e.clientX, y: e.clientY };
-
             // Idle Logic: Sleep if no movement for 4 seconds
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
             setExpression((prev) => (prev === "sleepy" ? "happy" : prev));
+
+            // Shake Detection
+            const now = Date.now();
+            const velocity = e.clientX - lastMouseXRef.current;
+            const direction = Math.sign(velocity);
+
+            if (direction !== lastDirectionRef.current && Math.abs(velocity) > 5) {
+                if (now - lastShakeTimeRef.current < 300) shakeCountRef.current += 1;
+                else shakeCountRef.current = 1;
+                lastShakeTimeRef.current = now;
+                lastDirectionRef.current = direction;
+            }
+            if (shakeCountRef.current >= 5) {
+                setExpression("confused");
+                shakeCountRef.current = 0;
+                if (confusedTimeoutRef.current) clearTimeout(confusedTimeoutRef.current);
+                confusedTimeoutRef.current = setTimeout(() => setExpression("happy"), 1500);
+            }
+            lastMouseXRef.current = e.clientX;
+
+            if (containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const dx = e.clientX - centerX;
+                const dy = e.clientY - centerY;
+                const angle = Math.atan2(dy, dx);
+                // Limit movement radius to 6px
+                const distance = Math.min(6, Math.hypot(dx, dy) / 15);
+                setEyeOffset({ x: Math.cos(angle) * distance, y: Math.sin(angle) * distance });
+            }
 
             idleTimeoutRef.current = setTimeout(() => {
                 if (!isSpeakingRef.current) setExpression("sleepy");
@@ -214,41 +395,202 @@ export default function RobotGuide({ isDark }) {
             }, 200);
         };
 
+        const handleScroll = () => {
+            if (!hasStarted) return;
+            if (scrollTimeoutRef.current) return;
+
+            scrollTimeoutRef.current = setTimeout(() => {
+                const sections = document.querySelectorAll('[data-section]');
+                let closestSection = null;
+                let minDistance = Infinity;
+                const viewportCenter = window.innerHeight / 2;
+
+                sections.forEach(section => {
+                    const rect = section.getBoundingClientRect();
+                    const sectionCenter = rect.top + rect.height / 2;
+                    const distance = Math.abs(viewportCenter - sectionCenter);
+
+                    if (rect.bottom > 0 && rect.top < window.innerHeight) {
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            closestSection = section;
+                        }
+                    }
+                });
+
+                if (closestSection) {
+                    activateSection(closestSection);
+                }
+                scrollTimeoutRef.current = null;
+            }, 100);
+        };
+
         window.addEventListener("mousemove", updatePosition);
+        window.addEventListener("scroll", handleScroll);
         return () => {
             window.removeEventListener("mousemove", updatePosition);
-            cancelAnimationFrame(animationFrameId);
+            window.removeEventListener("scroll", handleScroll);
             if (timeoutRef.current) clearTimeout(timeoutRef.current);
             if (idleTimeoutRef.current) clearTimeout(idleTimeoutRef.current);
+            if (confusedTimeoutRef.current) clearTimeout(confusedTimeoutRef.current);
+            if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
+            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
             if (typeof window !== "undefined" && window.speechSynthesis) {
                 window.speechSynthesis.cancel();
             }
+            if (highlightedElementRef.current) {
+                highlightedElementRef.current.style.outline = "";
+                highlightedElementRef.current.style.boxShadow = "";
+            }
         };
-    }, [hasStarted, isDocked]);
+    }, [hasStarted, isSoundEnabled]);
 
     const stopSpeaking = () => {
+        if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
         if (typeof window !== "undefined" && window.speechSynthesis) {
             window.speechSynthesis.cancel();
-            setIsSpeaking(false);
-            isSpeakingRef.current = false;
-            setSpokenText("");
-            currentUtteranceRef.current = null;
         }
+        setIsSpeaking(false);
+        isSpeakingRef.current = false;
+        setSpokenText("");
+        currentUtteranceRef.current = null;
+    };
+
+    const handleMouseDown = (e) => {
+        e.preventDefault();
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const rect = containerRef.current.getBoundingClientRect();
+        const offsetX = startX - rect.left;
+        const offsetY = startY - rect.top;
+        let hasMoved = false;
+
+        const handleMouseMove = (moveEvent) => {
+            const dx = moveEvent.clientX - startX;
+            const dy = moveEvent.clientY - startY;
+
+            if (!hasMoved && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+                hasMoved = true;
+                isDraggingRef.current = true;
+            }
+
+            if (hasMoved) {
+                setRobotPosition({
+                    position: "fixed",
+                    left: `${moveEvent.clientX - offsetX}px`,
+                    top: `${moveEvent.clientY - offsetY}px`,
+                    right: "auto",
+                    bottom: "auto",
+                    transition: "none"
+                });
+            }
+        };
+
+        const handleMouseUp = () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
+            if (hasMoved) {
+                setRobotPosition(prev => ({ ...prev, transition: "all 1s ease-in-out" }));
+                setTimeout(() => { isDraggingRef.current = false; }, 0);
+            }
+        };
+
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
     };
 
     const handleRobotClick = () => {
-        if (!isSpinning) {
-            setIsSpinning(true);
-            setTimeout(() => setIsSpinning(false), 600);
+        if (isDraggingRef.current) return;
+        if (!isSpinning && !isDancing) {
+            setIsDancing(true);
+            const jokes = [
+                "Why do programmers prefer dark mode? Because light attracts bugs.",
+                "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
+                "I would tell you a UDP joke, but you might not get it.",
+                "Why did the developer go broke? Because he used up all his cache.",
+                "A SQL query walks into a bar, walks up to two tables and asks, 'Can I join you?'"
+            ];
+            const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+            setExpression("excited");
+            speak(randomJoke);
+            setTimeout(() => setIsDancing(false), 250);
         }
     };
 
+    const handleRobotDoubleClick = (e) => {
+        if (isDraggingRef.current) return;
+        e.stopPropagation();
+        const jokes = [
+            "Why do programmers prefer dark mode? Because light attracts bugs.",
+            "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
+            "I would tell you a UDP joke, but you might not get it.",
+            "Why did the developer go broke? Because he used up all his cache.",
+            "A SQL query walks into a bar, walks up to two tables and asks, 'Can I join you?'"
+        ];
+        const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+        setExpression("excited");
+        speak(randomJoke);
+    };
+
+    const isFixed = robotPosition.position === "fixed";
 
     return (
         <>
-            {!hasStarted && (
+            <style>{`
+                @keyframes float {
+                    0% { transform: translateY(0px); }
+                    50% { transform: translateY(-15px); }
+                    100% { transform: translateY(0px); }
+                }
+                @keyframes wave {
+                    0% { transform: rotate(0deg); }
+                    25% { transform: rotate(-20deg); }
+                    50% { transform: rotate(10deg); }
+                    75% { transform: rotate(-10deg); }
+                    100% { transform: rotate(0deg); }
+                }
+                @keyframes wiggle {
+                    0% { transform: rotate(0deg); }
+                    25% { transform: rotate(-15deg); }
+                    50% { transform: rotate(15deg); }
+                    75% { transform: rotate(-5deg); }
+                    100% { transform: rotate(0deg); }
+                }
+                @keyframes dance {
+                    0%, 100% { transform: rotate(0deg) translateY(0); }
+                    25% { transform: rotate(-10deg) translateY(-5px); }
+                    50% { transform: rotate(10deg) translateY(0); }
+                    75% { transform: rotate(-5deg) translateY(-5px); }
+                }
+                @keyframes fly {
+                    0% { transform: translateY(0) rotate(5deg); }
+                    50% { transform: translateY(-10px) rotate(5deg); }
+                    100% { transform: translateY(0) rotate(5deg); }
+                }
+                @keyframes flicker {
+                    0% { opacity: 0.7; transform: scale(0.9); }
+                    100% { opacity: 1; transform: scale(1.1); }
+                }
+                @keyframes legWalk {
+                    0% { transform: rotate(-20deg); }
+                    100% { transform: rotate(20deg); }
+                }
+                @keyframes rainbow {
+                    0% { filter: hue-rotate(0deg); }
+                    100% { filter: hue-rotate(360deg); }
+                }
+                @keyframes fadeOut {
+                    0% { opacity: 0.6; transform: scale(1); }
+                    100% { opacity: 0; transform: scale(0.5); }
+                }
+                @keyframes blink {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0; }
+                }
+            `}</style>
+            {!isSoundEnabled && (
                 <button
-                    onClick={() => setHasStarted(true)}
+                    onClick={() => setIsSoundEnabled(true)}
                     style={{
                         position: "fixed",
                         bottom: "30px",
@@ -266,7 +608,7 @@ export default function RobotGuide({ isDark }) {
                         pointerEvents: "auto",
                     }}
                 >
-                    Start Tour
+                    Enable Sound
                 </button>
             )}
             {hasStarted && isSpeaking && (
@@ -292,63 +634,63 @@ export default function RobotGuide({ isDark }) {
                     Stop Speaking
                 </button>
             )}
-            {hasStarted && (
-                <button
-                    onClick={() => setIsDocked(!isDocked)}
-                    style={{
-                        position: "fixed",
-                        bottom: "30px",
-                        left: "30px",
-                        padding: "12px 24px",
-                        fontSize: "16px",
-                        backgroundColor: "#00F2FF",
-                        color: "#1A1A1A",
-                        border: "none",
-                        borderRadius: "30px",
-                        cursor: "pointer",
-                        zIndex: 10000,
-                        fontWeight: "bold",
-                        boxShadow: "0 0 20px rgba(0, 242, 255, 0.5)",
-                        pointerEvents: "auto",
-                    }}
-                >
-                    {isDocked ? "Undock" : "Dock"}
-                </button>
-            )}
-            <div ref={containerRef} style={{ position: "fixed", left: 0, top: 0, pointerEvents: "none", zIndex: 9999 }}>
+            {footprints.map(fp => (
+                <div key={fp.id} style={{
+                    position: "absolute",
+                    left: fp.x,
+                    top: fp.y,
+                    width: "12px",
+                    height: "6px",
+                    backgroundColor: "#00F2FF",
+                    borderRadius: "50%",
+                    pointerEvents: "none",
+                    animation: "fadeOut 2s forwards",
+                    zIndex: 9998
+                }} />
+            ))}
+            <div ref={containerRef} style={{ ...robotPosition, pointerEvents: "none", zIndex: 9999, animation: "float 3s ease-in-out infinite" }}>
                 {spokenText && (
                     <div style={{
                         position: "absolute",
-                        bottom: "100%",
+                        bottom: isFixed ? "auto" : "100%",
+                        top: isFixed ? "100%" : "auto",
                         left: "50%",
                         transform: "translateX(-50%)",
-                        marginBottom: "15px",
-                        backgroundColor: isDark ? "rgba(30, 30, 30, 0.95)" : "rgba(255, 255, 255, 0.95)",
-                        color: isDark ? "#fff" : "#000",
-                        padding: "12px",
-                        borderRadius: "12px",
-                        border: "1px solid #00F2FF",
-                        boxShadow: "0 4px 15px rgba(0, 242, 255, 0.2)",
-                        width: "220px",
-                        textAlign: "center",
-                        fontSize: "14px",
+                        marginBottom: isFixed ? "0" : "15px",
+                        marginTop: isFixed ? "15px" : "0",
+                        backgroundColor: "#000000",
+                        color: "#00FF00",
+                        borderRadius: "4px",
+                        border: "2px solid #00FF00",
+                        boxShadow: "0 0 15px rgba(0, 255, 0, 0.4)",
+                        width: "240px",
+                        textAlign: "left",
+                        fontSize: "13px",
+                        fontFamily: "'Courier New', Courier, monospace",
                         lineHeight: "1.4",
                         pointerEvents: "none",
-                        backdropFilter: "blur(5px)"
+                        overflow: "hidden"
                     }}>
-                        {spokenText}
                         <div style={{
-                            position: "absolute",
-                            top: "100%",
-                            left: "50%",
-                            marginLeft: "-6px",
-                            borderWidth: "6px",
-                            borderStyle: "solid",
-                            borderColor: `${isDark ? "rgba(30, 30, 30, 0.95)" : "rgba(255, 255, 255, 0.95)"} transparent transparent transparent`
-                        }}></div>
+                            backgroundColor: "#00FF00",
+                            color: "#000000",
+                            padding: "2px 6px",
+                            fontSize: "10px",
+                            fontWeight: "bold",
+                            display: "flex",
+                            justifyContent: "space-between"
+                        }}>
+                            <span>ROBOT_TERM.EXE</span>
+                            <span>X</span>
+                        </div>
+                        <div style={{ padding: "10px" }}>
+                            <span style={{ marginRight: "5px" }}>&gt;</span>
+                            {displayedText}
+                            <span style={{ animation: "blink 1s step-end infinite", fontWeight: "bold", marginLeft: "2px" }}>_</span>
+                        </div>
                     </div>
                 )}
-                <RobotIcon expression={expression} isSpeaking={isSpeaking} isDark={isDark} onRobotClick={handleRobotClick} isSpinning={isSpinning} />
+                <RobotIcon expression={expression} isSpeaking={isSpeaking} isDark={isDark} onRobotClick={handleRobotClick} onRobotDoubleClick={handleRobotDoubleClick} onMouseDown={handleMouseDown} isSpinning={isSpinning} isBlinking={isBlinking} eyeOffset={eyeOffset} isWiggling={isWiggling} isDancing={isDancing} isMoving={isMoving} />
             </div>
         </>
     );
