@@ -1,21 +1,14 @@
-import { useEffect } from "react";
 import styles from "../page.module.css";
 
-export default function Header({ isDark, toggleTheme, setIsDark }) {
-    useEffect(() => {
-        const storedTheme = localStorage.getItem("theme");
-        if (storedTheme) {
-            setIsDark(storedTheme === "dark");
-        } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-            setIsDark(true);
-        } else {
-            setIsDark(false);
-        }
-    }, [setIsDark]);
-
+export default function Header({ isDark, toggleTheme }) {
     return (
         <header className={styles.header}>
             <div className={styles.logo}>VimalVerma</div>
+            <nav aria-label="Main Navigation" style={{ display: "flex", gap: "20px", marginLeft: "auto", marginRight: "20px" }}>
+                <a href="#introduction" style={{ textDecoration: "none", color: "inherit", fontSize: "0.9rem", fontWeight: 500 }}>Home</a>
+                <a href="#skills" style={{ textDecoration: "none", color: "inherit", fontSize: "0.9rem", fontWeight: 500 }}>Skills</a>
+                <a href="#projects" style={{ textDecoration: "none", color: "inherit", fontSize: "0.9rem", fontWeight: 500 }}>Projects</a>
+            </nav>
             {isDark !== null && (
                 <button
                     onClick={toggleTheme}

@@ -32,6 +32,12 @@ const Eyes = ({ expression, isBlinking, eyeOffset = { x: 0, y: 0 } }) => {
             <path d="M82 72 Q90 76 98 72" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />
         </g>
     );
+    if (expression === "love") return (
+        <g>
+            <path d="M44 68 C44 62 38 62 38 68 C38 74 50 82 50 82 C50 82 62 74 62 68 C62 62 56 62 56 68 C56 74 50 82 50 82" fill="#FF4444" />
+            <path d="M84 68 C84 62 78 62 78 68 C78 74 90 82 90 82 C90 82 102 74 102 68 C102 62 96 62 96 68 C96 74 90 82 90 82" fill="#FF4444" />
+        </g>
+    );
     return <g style={{ transform: `translate(${eyeOffset.x}px, ${eyeOffset.y}px)` }}>
         <path id="Vector_7" d="M50.5 78.5C54.9183 78.5 58.5 74.9183 58.5 70.5C58.5 66.0817 54.9183 62.5 50.5 62.5C46.0817 62.5 42.5 66.0817 42.5 70.5C42.5 74.9183 46.0817 78.5 50.5 78.5Z" fill="#00F2FF" />
         <path id="Vector_8" d="M90.5 78.5C94.9183 78.5 98.5 74.9183 98.5 70.5C98.5 66.0817 94.9183 62.5 90.5 62.5C86.0817 62.5 82.5 66.0817 82.5 70.5C82.5 74.9183 86.0817 78.5 90.5 78.5Z" fill="#00F2FF" />
@@ -53,10 +59,11 @@ const Mouth = ({ expression }) => {
     if (expression === "sleepy") return <path id="Zzz" d="M111.608 34.5V32.6747L118.866 22.4901H111.594V19.9545H122.73V21.7798L115.464 31.9645H122.744V34.5H111.608ZM124.99 34.5V32.696L130.331 26.0838V26.0057H125.175V23.5909H133.975V25.5582L128.961 32.0071V32.0852H134.159V34.5H124.99ZM136.416 34.5V32.696L141.757 26.0838V26.0057H136.601V23.5909H145.401V25.5582L140.386 32.0071V32.0852H145.585V34.5H136.416Z" fill="#00F2FF" />;
     if (expression === "excited") return <path id="Vector_3" d="M55.5 110.5L62.5 103.5L70.5 110.5L78.5 103.5L85.5 110.5" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" />;
     if (expression === "confused") return <path d="M65 112 Q72 108 80 112 T95 112" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />;
+    if (expression === "love") return <path d="M65 110 Q70.5 118 76 110" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />;
     return <path id="Vector_9" d="M70.5 119.5C73.8137 119.5 76.5 116.814 76.5 113.5C76.5 110.186 73.8137 107.5 70.5 107.5C67.1863 107.5 64.5 110.186 64.5 113.5C64.5 116.814 67.1863 119.5 70.5 119.5Z" stroke="#00F2FF" strokeWidth="2" />;
 };
 
-const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDoubleClick, onMouseDown, isSpinning, isBlinking, eyeOffset, isWiggling, isDancing, isMoving }) => {
+const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDoubleClick, onMouseDown, onMouseMove, isSpinning, isBlinking, eyeOffset, isWiggling, isDancing, isMoving, ...props }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
@@ -64,9 +71,11 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
             width="100" height="100" viewBox="-20 -25 188 195" fill="none" xmlns="http://www.w3.org/2000/svg"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onMouseMove={onMouseMove}
             onClick={onRobotClick}
             onMouseDown={onMouseDown}
             onDoubleClick={onRobotDoubleClick}
+            {...props}
             style={{
                 filter: isHovered ? "drop-shadow(0px 0px 15px #00F2FF)" : "drop-shadow(0px 4px 8px rgba(0,0,0,0.15))",
                 pointerEvents: "auto",
@@ -134,6 +143,9 @@ export default function RobotGuide({ isDark }) {
     const [isDancing, setIsDancing] = useState(false);
     const [isMoving, setIsMoving] = useState(false);
     const [footprints, setFootprints] = useState([]);
+    const [hearts, setHearts] = useState([]);
+    const lastPetPosition = useRef({ x: 0, y: 0 });
+    const petScore = useRef(0);
     const [eyeOffset, setEyeOffset] = useState({ x: 0, y: 0 });
     const [robotPosition, setRobotPosition] = useState({ position: "fixed", right: "20px", top: "50px" });
     const currentSectionRef = useRef(null);
@@ -151,6 +163,12 @@ export default function RobotGuide({ isDark }) {
     const scrollTimeoutRef = useRef(null);
     const isDraggingRef = useRef(false);
     const speechTimeoutRef = useRef(null);
+    const [voices, setVoices] = useState([]);
+    const [isGameActive, setIsGameActive] = useState(false);
+    const [gameScore, setGameScore] = useState(0);
+    const [fallingItems, setFallingItems] = useState([]);
+    const gameLoopRef = useRef(null);
+    const [showSettings, setShowSettings] = useState(false);
 
     const speak = (text) => {
         if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
@@ -168,7 +186,6 @@ export default function RobotGuide({ isDark }) {
                 currentUtteranceRef.current = utterance;
 
                 // Select a more human-sounding voice if available
-                const voices = window.speechSynthesis.getVoices();
                 const preferredVoice = voices.find(voice =>
                     (voice.name.includes("Google") && voice.lang.includes("en")) ||
                     (voice.name.includes("Natural") && voice.lang.includes("en"))
@@ -212,6 +229,24 @@ export default function RobotGuide({ isDark }) {
         window.addEventListener("click", handleSectionClick);
         return () => window.removeEventListener("click", handleSectionClick);
     }, [hasStarted]);
+
+    useEffect(() => {
+        const updateVoices = () => {
+            setVoices(window.speechSynthesis.getVoices());
+        };
+        updateVoices();
+        window.speechSynthesis.onvoiceschanged = updateVoices;
+        return () => { window.speechSynthesis.onvoiceschanged = null; };
+    }, []);
+
+    useEffect(() => {
+        if (hearts.length > 0) {
+            const timer = setTimeout(() => {
+                setHearts(prev => prev.filter(h => Date.now() - h.id < 1000));
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [hearts]);
 
     useEffect(() => {
         const blinkInterval = setInterval(() => {
@@ -443,7 +478,102 @@ export default function RobotGuide({ isDark }) {
                 highlightedElementRef.current.style.boxShadow = "";
             }
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hasStarted, isSoundEnabled]);
+
+    const startGame = () => {
+        setIsGameActive(true);
+        setGameScore(0);
+        setFallingItems([]);
+        speak("Catch the falling energy bolts to charge me up! Use arrow keys or drag me.");
+        setExpression("excited");
+    };
+
+    const stopGame = () => {
+        setIsGameActive(false);
+        setFallingItems([]);
+        if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
+        speak(`Good game! You collected ${gameScore} energy bolts.`);
+        setExpression("happy");
+    };
+
+    useEffect(() => {
+        if (!isGameActive) return;
+
+        let lastSpawnTime = 0;
+        const speed = 4;
+
+        const loop = (timestamp) => {
+            if (!lastSpawnTime) lastSpawnTime = timestamp;
+
+            if (timestamp - lastSpawnTime > 1000) {
+                setFallingItems(prev => [
+                    ...prev,
+                    { id: Date.now(), x: Math.random() * (window.innerWidth - 50) + 25, y: -50 }
+                ]);
+                lastSpawnTime = timestamp;
+            }
+
+            setFallingItems(prev => {
+                const robotRect = containerRef.current?.getBoundingClientRect();
+                const nextItems = [];
+                let caught = false;
+
+                prev.forEach(item => {
+                    const nextY = item.y + speed;
+                    if (robotRect) {
+                        const dist = Math.hypot(
+                            (robotRect.left + robotRect.width / 2) - (item.x + 15),
+                            (robotRect.top + robotRect.height / 2) - (nextY + 15)
+                        );
+                        if (dist < 60) {
+                            caught = true;
+                            return;
+                        }
+                    }
+                    if (nextY < window.innerHeight) nextItems.push({ ...item, y: nextY });
+                });
+
+                if (caught) {
+                    setGameScore(s => s + 1);
+                    setExpression("love");
+                    if (confusedTimeoutRef.current) clearTimeout(confusedTimeoutRef.current);
+                    confusedTimeoutRef.current = setTimeout(() => setExpression("happy"), 500);
+                }
+                return nextItems;
+            });
+            gameLoopRef.current = requestAnimationFrame(loop);
+        };
+        gameLoopRef.current = requestAnimationFrame(loop);
+        return () => cancelAnimationFrame(gameLoopRef.current);
+    }, [isGameActive]);
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+                e.preventDefault();
+                setIsMoving(true);
+                if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
+                moveTimeoutRef.current = setTimeout(() => setIsMoving(false), 200);
+
+                setRobotPosition(prev => {
+                    const rect = containerRef.current.getBoundingClientRect();
+                    let left = rect.left;
+                    let top = rect.top;
+                    const step = 15;
+
+                    if (e.key === "ArrowLeft") left -= step;
+                    if (e.key === "ArrowRight") left += step;
+                    if (e.key === "ArrowUp") top -= step;
+                    if (e.key === "ArrowDown") top += step;
+
+                    return { position: "fixed", left: `${left}px`, top: `${top}px`, transition: "none" };
+                });
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
 
     const stopSpeaking = () => {
         if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
@@ -532,6 +662,26 @@ export default function RobotGuide({ isDark }) {
         speak(randomJoke);
     };
 
+    const handleRobotMouseMove = (e) => {
+        const now = Date.now();
+        const dist = Math.hypot(e.clientX - lastPetPosition.current.x, e.clientY - lastPetPosition.current.y);
+        lastPetPosition.current = { x: e.clientX, y: e.clientY };
+
+        if (dist > 5) {
+            petScore.current += 1;
+            if (petScore.current > 30) {
+                setExpression("love");
+                if (Math.random() > 0.7) setHearts(prev => [...prev, { id: Date.now() + Math.random(), x: e.clientX - 10, y: e.clientY - 20 }]);
+                
+                if (confusedTimeoutRef.current) clearTimeout(confusedTimeoutRef.current);
+                confusedTimeoutRef.current = setTimeout(() => {
+                    setExpression("happy");
+                    petScore.current = 0;
+                }, 2000);
+            }
+        }
+    };
+
     const isFixed = robotPosition.position === "fixed";
 
     return (
@@ -587,52 +737,127 @@ export default function RobotGuide({ isDark }) {
                     0%, 100% { opacity: 1; }
                     50% { opacity: 0; }
                 }
+                @keyframes floatUp {
+                    0% { transform: translateY(0) scale(1); opacity: 1; }
+                    100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
+                }
+                .settings-panel {
+                    position: fixed;
+                    bottom: 90px;
+                    right: 30px;
+                    background: ${isDark ? "rgba(30, 30, 30, 0.95)" : "rgba(255, 255, 255, 0.95)"};
+                    backdrop-filter: blur(10px);
+                    padding: 15px;
+                    border-radius: 16px;
+                    border: 1px solid ${isDark ? "#444" : "#eee"};
+                    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                    z-index: 10001;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                    min-width: 180px;
+                    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                    transform-origin: bottom right;
+                }
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translateY(20px) scale(0.95); }
+                    to { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                .setting-item {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    font-size: 14px;
+                    color: ${isDark ? "#eee" : "#333"};
+                    font-weight: 500;
+                }
+                .setting-btn {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    padding: 0;
+                    font-family: inherit;
+                }
             `}</style>
-            {!isSoundEnabled && (
-                <button
-                    onClick={() => setIsSoundEnabled(true)}
-                    style={{
-                        position: "fixed",
-                        bottom: "30px",
-                        right: "30px",
-                        padding: "12px 24px",
-                        fontSize: "16px",
-                        backgroundColor: "#00F2FF",
-                        color: "#1A1A1A",
-                        border: "none",
-                        borderRadius: "30px",
-                        cursor: "pointer",
-                        zIndex: 10000,
-                        fontWeight: "bold",
-                        boxShadow: "0 0 20px rgba(0, 242, 255, 0.5)",
-                        pointerEvents: "auto",
-                    }}
-                >
-                    Enable Sound
-                </button>
-            )}
-            {hasStarted && isSpeaking && (
-                <button
-                    onClick={stopSpeaking}
-                    style={{
-                        position: "fixed",
-                        bottom: "30px",
-                        right: "30px",
-                        padding: "12px 24px",
-                        fontSize: "16px",
-                        backgroundColor: "#FF4444",
-                        color: "#FFFFFF",
-                        border: "none",
-                        borderRadius: "30px",
-                        cursor: "pointer",
-                        zIndex: 10000,
-                        fontWeight: "bold",
-                        boxShadow: "0 0 20px rgba(255, 68, 68, 0.5)",
-                        pointerEvents: "auto",
-                    }}
-                >
-                    Stop Speaking
-                </button>
+            <button
+                onClick={() => setShowSettings(!showSettings)}
+                aria-label="Settings"
+                style={{
+                    position: "fixed",
+                    bottom: "30px",
+                    right: "30px",
+                    width: "50px",
+                    height: "50px",
+                    borderRadius: "50%",
+                    backgroundColor: isDark ? "#1A1A1A" : "#FFFFFF",
+                    border: "2px solid #00F2FF",
+                    color: "#00F2FF",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    zIndex: 10002,
+                    boxShadow: "0 4px 15px rgba(0, 242, 255, 0.3)",
+                    transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                    transform: showSettings ? "rotate(90deg)" : "rotate(0deg)"
+                }}
+            >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+
+            {showSettings && (
+                <div className="settings-panel">
+                    <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "1px", color: isDark ? "#888" : "#999", marginBottom: "5px" }}>Controls</div>
+                    
+                    <div className="setting-item">
+                        <span>Sound Effects</span>
+                        <button 
+                            className="setting-btn"
+                            onClick={() => setIsSoundEnabled(!isSoundEnabled)}
+                            style={{ color: isSoundEnabled ? "#00F2FF" : "#FF4444", fontWeight: "bold" }}
+                        >
+                            {isSoundEnabled ? "ON" : "OFF"}
+                        </button>
+                    </div>
+
+                    <div className="setting-item">
+                        <span>Mini Game</span>
+                        <button 
+                            className="setting-btn"
+                            onClick={() => {
+                                if (isGameActive) stopGame();
+                                else { startGame(); setShowSettings(false); }
+                            }}
+                            style={{ color: isGameActive ? "#FF4444" : "#00F2FF", fontWeight: "bold" }}
+                        >
+                            {isGameActive ? "STOP" : "PLAY"}
+                        </button>
+                    </div>
+
+                    {isSpeaking && (
+                        <button
+                            onClick={stopSpeaking}
+                            style={{
+                                marginTop: "5px",
+                                width: "100%",
+                                padding: "8px",
+                                background: "rgba(255, 68, 68, 0.1)",
+                                color: "#FF4444",
+                                border: "1px solid rgba(255, 68, 68, 0.3)",
+                                borderRadius: "8px",
+                                cursor: "pointer",
+                                fontSize: "13px",
+                                fontWeight: "600",
+                                transition: "background 0.2s"
+                            }}
+                        >
+                            Stop Speaking
+                        </button>
+                    )}
+                </div>
             )}
             {footprints.map(fp => (
                 <div key={fp.id} style={{
@@ -647,6 +872,34 @@ export default function RobotGuide({ isDark }) {
                     animation: "fadeOut 2s forwards",
                     zIndex: 9998
                 }} />
+            ))}
+            {isGameActive && (
+                <>
+                    <div style={{ position: "fixed", top: "20px", right: "20px", fontSize: "24px", fontWeight: "bold", color: "#00F2FF", zIndex: 10002, textShadow: "0 0 5px #000" }}>
+                        Score: {gameScore}
+                    </div>
+                    {fallingItems.map(item => (
+                        <div key={item.id} style={{
+                            position: "fixed",
+                            left: item.x,
+                            top: item.y,
+                            fontSize: "30px",
+                            pointerEvents: "none",
+                            zIndex: 10000
+                        }}>⚡</div>
+                    ))}
+                </>
+            )}
+            {hearts.map(h => (
+                <div key={h.id} style={{
+                    position: "fixed",
+                    left: h.x,
+                    top: h.y,
+                    fontSize: "24px",
+                    pointerEvents: "none",
+                    animation: "floatUp 1s ease-out forwards",
+                    zIndex: 10001
+                }}>❤️</div>
             ))}
             <div ref={containerRef} style={{ ...robotPosition, pointerEvents: "none", zIndex: 9999, animation: "float 3s ease-in-out infinite" }}>
                 {spokenText && (
@@ -690,7 +943,30 @@ export default function RobotGuide({ isDark }) {
                         </div>
                     </div>
                 )}
-                <RobotIcon expression={expression} isSpeaking={isSpeaking} isDark={isDark} onRobotClick={handleRobotClick} onRobotDoubleClick={handleRobotDoubleClick} onMouseDown={handleMouseDown} isSpinning={isSpinning} isBlinking={isBlinking} eyeOffset={eyeOffset} isWiggling={isWiggling} isDancing={isDancing} isMoving={isMoving} />
+                <RobotIcon
+                    expression={expression}
+                    isSpeaking={isSpeaking}
+                    isDark={isDark}
+                    onRobotClick={handleRobotClick}
+                    onRobotDoubleClick={handleRobotDoubleClick}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleRobotMouseMove}
+                    isSpinning={isSpinning}
+                    isBlinking={isBlinking}
+                    eyeOffset={eyeOffset}
+                    isWiggling={isWiggling}
+                    isDancing={isDancing}
+                    isMoving={isMoving}
+                    role="button"
+                    aria-label="Interactive Robot Guide"
+                    tabIndex="0"
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            handleRobotClick();
+                        }
+                    }}
+                />
             </div>
         </>
     );
