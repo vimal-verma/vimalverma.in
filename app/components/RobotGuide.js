@@ -169,6 +169,8 @@ export default function RobotGuide({ isDark }) {
     const [fallingItems, setFallingItems] = useState([]);
     const gameLoopRef = useRef(null);
     const [showSettings, setShowSettings] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
+    const [isTerminalDown, setIsTerminalDown] = useState(true);
 
     const speak = (text) => {
         if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
@@ -240,6 +242,25 @@ export default function RobotGuide({ isDark }) {
     }, []);
 
     useEffect(() => {
+        const checkTerminalPosition = () => {
+            if (containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                // If robot is in the top half of the viewport, show terminal below (down)
+                const isUpper = (rect.top + rect.height / 2) < (window.innerHeight / 2);
+                setIsTerminalDown(isUpper);
+            }
+        };
+
+        checkTerminalPosition();
+        window.addEventListener("scroll", checkTerminalPosition);
+        window.addEventListener("resize", checkTerminalPosition);
+        return () => {
+            window.removeEventListener("scroll", checkTerminalPosition);
+            window.removeEventListener("resize", checkTerminalPosition);
+        };
+    }, [robotPosition]);
+
+    useEffect(() => {
         if (hearts.length > 0) {
             const timer = setTimeout(() => {
                 setHearts(prev => prev.filter(h => Date.now() - h.id < 1000));
@@ -307,13 +328,14 @@ export default function RobotGuide({ isDark }) {
 
     useEffect(() => {
         // Find all sections on mount
-        allSectionsRef.current = Array.from(document.querySelectorAll('[data-section]'))
+        const sections = Array.from(document.querySelectorAll('[data-section]'))
             .map(el => el.getAttribute('data-section'));
+        allSectionsRef.current = [...new Set(sections)];
 
         const activateSection = (sectionEl) => {
             const sectionId = sectionEl.getAttribute('data-section');
 
-            if (sectionId && sectionId !== currentSectionRef.current) {
+            if (sectionId && (sectionId !== currentSectionRef.current || sectionEl !== highlightedElementRef.current)) {
                 if (highlightedElementRef.current) {
                     highlightedElementRef.current.style.outline = "";
                     highlightedElementRef.current.style.boxShadow = "";
@@ -550,6 +572,7 @@ export default function RobotGuide({ isDark }) {
 
     useEffect(() => {
         const handleKeyDown = (e) => {
+            if (!containerRef.current) return;
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
                 e.preventDefault();
                 setIsMoving(true);
@@ -813,6 +836,17 @@ export default function RobotGuide({ isDark }) {
                     <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "1px", color: isDark ? "#888" : "#999", marginBottom: "5px" }}>Controls</div>
                     
                     <div className="setting-item">
+                        <span>Robot Visibility</span>
+                        <button 
+                            className="setting-btn"
+                            onClick={() => setIsVisible(!isVisible)}
+                            style={{ color: isVisible ? "#00F2FF" : "#FF4444", fontWeight: "bold" }}
+                        >
+                            {isVisible ? "SHOW" : "HIDE"}
+                        </button>
+                    </div>
+
+                    <div className="setting-item">
                         <span>Sound Effects</span>
                         <button 
                             className="setting-btn"
@@ -901,16 +935,17 @@ export default function RobotGuide({ isDark }) {
                     zIndex: 10001
                 }}>❤️</div>
             ))}
+            {isVisible && (
             <div ref={containerRef} style={{ ...robotPosition, pointerEvents: "none", zIndex: 9999, animation: "float 3s ease-in-out infinite" }}>
                 {spokenText && (
                     <div style={{
                         position: "absolute",
-                        bottom: isFixed ? "auto" : "100%",
-                        top: isFixed ? "100%" : "auto",
+                        bottom: isTerminalDown ? "auto" : "100%",
+                        top: isTerminalDown ? "100%" : "auto",
                         left: "50%",
                         transform: "translateX(-50%)",
-                        marginBottom: isFixed ? "0" : "15px",
-                        marginTop: isFixed ? "15px" : "0",
+                        marginBottom: isTerminalDown ? "0" : "15px",
+                        marginTop: isTerminalDown ? "15px" : "0",
                         backgroundColor: "#000000",
                         color: "#00FF00",
                         borderRadius: "4px",
@@ -968,6 +1003,7 @@ export default function RobotGuide({ isDark }) {
                     }}
                 />
             </div>
+            )}
         </>
     );
 }

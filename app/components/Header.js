@@ -2,12 +2,40 @@ import styles from "../page.module.css";
 
 export default function Header({ isDark, toggleTheme }) {
     return (
-        <header className={styles.header}>
-            <div className={styles.logo}>VimalVerma</div>
-            <nav aria-label="Main Navigation" style={{ display: "flex", gap: "20px", marginLeft: "auto", marginRight: "20px" }}>
-                <a href="#introduction" style={{ textDecoration: "none", color: "inherit", fontSize: "0.9rem", fontWeight: 500 }}>Home</a>
-                <a href="#skills" style={{ textDecoration: "none", color: "inherit", fontSize: "0.9rem", fontWeight: 500 }}>Skills</a>
-                <a href="#projects" style={{ textDecoration: "none", color: "inherit", fontSize: "0.9rem", fontWeight: 500 }}>Projects</a>
+        <header className={styles.header} style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1000,
+            backdropFilter: "blur(12px)",
+            backgroundColor: isDark ? "rgba(26, 26, 26, 0.85)" : "rgba(255, 255, 255, 0.85)",
+            borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
+            transition: "background-color 0.3s ease, border-color 0.3s ease"
+        }}>
+            <style>{`
+                .nav-link {
+                    position: relative;
+                    padding: 5px 0;
+                }
+                .nav-link::after {
+                    content: '';
+                    position: absolute;
+                    width: 0;
+                    height: 2px;
+                    bottom: 0;
+                    left: 0;
+                    background-color: #00F2FF;
+                    transition: width 0.3s ease;
+                }
+                .nav-link:hover::after {
+                    width: 100%;
+                }
+            `}</style>
+            <div className={styles.logo} style={{ fontWeight: "bold", fontSize: "1.5rem", background: "linear-gradient(45deg, #00F2FF, #0078FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }} data-narrate="Vimal Kumar" data-section="Header">VimalVerma</div>
+            <nav aria-label="Main Navigation" style={{ display: "flex", gap: "25px", marginLeft: "auto", marginRight: "25px", alignItems: "center" }}>
+                <a href="#introduction" className="nav-link" style={{ textDecoration: "none", color: "inherit", fontSize: "0.95rem", fontWeight: 500 }}>Home</a>
+                <a href="#skills" className="nav-link" style={{ textDecoration: "none", color: "inherit", fontSize: "0.95rem", fontWeight: 500 }}>Skills</a>
+                <a href="#projects" className="nav-link" style={{ textDecoration: "none", color: "inherit", fontSize: "0.95rem", fontWeight: 500 }}>Projects</a>
+                <a href="#contact" className="nav-link" style={{ textDecoration: "none", color: "inherit", fontSize: "0.95rem", fontWeight: 500 }}>Contact</a>
             </nav>
             {isDark !== null && (
                 <button
