@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import styles from "../page.module.css";
 
 const strokeColor = "#333";
 const faceColor = "#fff";
@@ -76,11 +77,8 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
             onMouseDown={onMouseDown}
             onDoubleClick={onRobotDoubleClick}
             {...props}
+            className={styles.robotSvg}
             style={{
-                filter: isHovered ? "drop-shadow(0px 0px 15px #00F2FF)" : "drop-shadow(0px 4px 8px rgba(0,0,0,0.15))",
-                pointerEvents: "auto",
-                cursor: "pointer",
-                transition: "filter 0.3s ease, transform 0.6s ease",
                 transform: isSpinning ? "rotate(360deg)" : "rotate(0deg)",
                 transformOrigin: "center",
                 animation: isDancing ? "dance 0.6s ease-in-out infinite" : (isMoving ? "fly 1s ease-in-out infinite" : "none")
@@ -709,119 +707,11 @@ export default function RobotGuide({ isDark }) {
 
     return (
         <>
-            <style>{`
-                @keyframes float {
-                    0% { transform: translateY(0px); }
-                    50% { transform: translateY(-15px); }
-                    100% { transform: translateY(0px); }
-                }
-                @keyframes wave {
-                    0% { transform: rotate(0deg); }
-                    25% { transform: rotate(-20deg); }
-                    50% { transform: rotate(10deg); }
-                    75% { transform: rotate(-10deg); }
-                    100% { transform: rotate(0deg); }
-                }
-                @keyframes wiggle {
-                    0% { transform: rotate(0deg); }
-                    25% { transform: rotate(-15deg); }
-                    50% { transform: rotate(15deg); }
-                    75% { transform: rotate(-5deg); }
-                    100% { transform: rotate(0deg); }
-                }
-                @keyframes dance {
-                    0%, 100% { transform: rotate(0deg) translateY(0); }
-                    25% { transform: rotate(-10deg) translateY(-5px); }
-                    50% { transform: rotate(10deg) translateY(0); }
-                    75% { transform: rotate(-5deg) translateY(-5px); }
-                }
-                @keyframes fly {
-                    0% { transform: translateY(0) rotate(5deg); }
-                    50% { transform: translateY(-10px) rotate(5deg); }
-                    100% { transform: translateY(0) rotate(5deg); }
-                }
-                @keyframes flicker {
-                    0% { opacity: 0.7; transform: scale(0.9); }
-                    100% { opacity: 1; transform: scale(1.1); }
-                }
-                @keyframes legWalk {
-                    0% { transform: rotate(-20deg); }
-                    100% { transform: rotate(20deg); }
-                }
-                @keyframes rainbow {
-                    0% { filter: hue-rotate(0deg); }
-                    100% { filter: hue-rotate(360deg); }
-                }
-                @keyframes fadeOut {
-                    0% { opacity: 0.6; transform: scale(1); }
-                    100% { opacity: 0; transform: scale(0.5); }
-                }
-                @keyframes blink {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0; }
-                }
-                @keyframes floatUp {
-                    0% { transform: translateY(0) scale(1); opacity: 1; }
-                    100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
-                }
-                .settings-panel {
-                    position: fixed;
-                    bottom: 90px;
-                    right: 30px;
-                    background: ${isDark ? "rgba(30, 30, 30, 0.95)" : "rgba(255, 255, 255, 0.95)"};
-                    backdrop-filter: blur(10px);
-                    padding: 15px;
-                    border-radius: 16px;
-                    border: 1px solid ${isDark ? "#444" : "#eee"};
-                    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-                    z-index: 10001;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 12px;
-                    min-width: 180px;
-                    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-                    transform-origin: bottom right;
-                }
-                @keyframes slideUp {
-                    from { opacity: 0; transform: translateY(20px) scale(0.95); }
-                    to { opacity: 1; transform: translateY(0) scale(1); }
-                }
-                .setting-item {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    font-size: 14px;
-                    color: ${isDark ? "#eee" : "#333"};
-                    font-weight: 500;
-                }
-                .setting-btn {
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    padding: 0;
-                    font-family: inherit;
-                }
-            `}</style>
             <button
                 onClick={() => setShowSettings(!showSettings)}
                 aria-label="Settings"
+                className={styles.settingsToggle}
                 style={{
-                    position: "fixed",
-                    bottom: "30px",
-                    right: "30px",
-                    width: "50px",
-                    height: "50px",
-                    borderRadius: "50%",
-                    backgroundColor: isDark ? "#1A1A1A" : "#FFFFFF",
-                    border: "2px solid #00F2FF",
-                    color: "#00F2FF",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    zIndex: 10002,
-                    boxShadow: "0 4px 15px rgba(0, 242, 255, 0.3)",
-                    transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                     transform: showSettings ? "rotate(90deg)" : "rotate(0deg)"
                 }}
             >
@@ -832,13 +722,13 @@ export default function RobotGuide({ isDark }) {
             </button>
 
             {showSettings && (
-                <div className="settings-panel">
+                <div className={styles.settingsPanel}>
                     <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "1px", color: isDark ? "#888" : "#999", marginBottom: "5px" }}>Controls</div>
                     
-                    <div className="setting-item">
+                    <div className={styles.settingItem}>
                         <span>Robot Visibility</span>
                         <button 
-                            className="setting-btn"
+                            className={styles.settingBtn}
                             onClick={() => setIsVisible(!isVisible)}
                             style={{ color: isVisible ? "#00F2FF" : "#FF4444", fontWeight: "bold" }}
                         >
@@ -846,10 +736,10 @@ export default function RobotGuide({ isDark }) {
                         </button>
                     </div>
 
-                    <div className="setting-item">
+                    <div className={styles.settingItem}>
                         <span>Sound Effects</span>
                         <button 
-                            className="setting-btn"
+                            className={styles.settingBtn}
                             onClick={() => setIsSoundEnabled(!isSoundEnabled)}
                             style={{ color: isSoundEnabled ? "#00F2FF" : "#FF4444", fontWeight: "bold" }}
                         >
@@ -857,10 +747,10 @@ export default function RobotGuide({ isDark }) {
                         </button>
                     </div>
 
-                    <div className="setting-item">
+                    <div className={styles.settingItem}>
                         <span>Mini Game</span>
                         <button 
-                            className="setting-btn"
+                            className={styles.settingBtn}
                             onClick={() => {
                                 if (isGameActive) stopGame();
                                 else { startGame(); setShowSettings(false); }
@@ -874,19 +764,7 @@ export default function RobotGuide({ isDark }) {
                     {isSpeaking && (
                         <button
                             onClick={stopSpeaking}
-                            style={{
-                                marginTop: "5px",
-                                width: "100%",
-                                padding: "8px",
-                                background: "rgba(255, 68, 68, 0.1)",
-                                color: "#FF4444",
-                                border: "1px solid rgba(255, 68, 68, 0.3)",
-                                borderRadius: "8px",
-                                cursor: "pointer",
-                                fontSize: "13px",
-                                fontWeight: "600",
-                                transition: "background 0.2s"
-                            }}
+                            className={styles.stopSpeakingBtn}
                         >
                             Stop Speaking
                         </button>
@@ -894,87 +772,47 @@ export default function RobotGuide({ isDark }) {
                 </div>
             )}
             {footprints.map(fp => (
-                <div key={fp.id} style={{
-                    position: "absolute",
+                <div key={fp.id} className={styles.footprint} style={{
                     left: fp.x,
-                    top: fp.y,
-                    width: "12px",
-                    height: "6px",
-                    backgroundColor: "#00F2FF",
-                    borderRadius: "50%",
-                    pointerEvents: "none",
-                    animation: "fadeOut 2s forwards",
-                    zIndex: 9998
+                    top: fp.y
                 }} />
             ))}
             {isGameActive && (
                 <>
-                    <div style={{ position: "fixed", top: "20px", right: "20px", fontSize: "24px", fontWeight: "bold", color: "#00F2FF", zIndex: 10002, textShadow: "0 0 5px #000" }}>
+                    <div className={styles.gameScore}>
                         Score: {gameScore}
                     </div>
                     {fallingItems.map(item => (
-                        <div key={item.id} style={{
-                            position: "fixed",
+                        <div key={item.id} className={styles.fallingItem} style={{
                             left: item.x,
-                            top: item.y,
-                            fontSize: "30px",
-                            pointerEvents: "none",
-                            zIndex: 10000
+                            top: item.y
                         }}>⚡</div>
                     ))}
                 </>
             )}
             {hearts.map(h => (
-                <div key={h.id} style={{
-                    position: "fixed",
+                <div key={h.id} className={styles.heart} style={{
                     left: h.x,
-                    top: h.y,
-                    fontSize: "24px",
-                    pointerEvents: "none",
-                    animation: "floatUp 1s ease-out forwards",
-                    zIndex: 10001
+                    top: h.y
                 }}>❤️</div>
             ))}
             {isVisible && (
-            <div ref={containerRef} style={{ ...robotPosition, pointerEvents: "none", zIndex: 9999, animation: "float 3s ease-in-out infinite" }}>
+            <div ref={containerRef} className={styles.robotContainer} style={robotPosition}>
                 {spokenText && (
-                    <div style={{
-                        position: "absolute",
+                    <div className={styles.terminal} style={{
                         bottom: isTerminalDown ? "auto" : "100%",
                         top: isTerminalDown ? "100%" : "auto",
-                        left: "50%",
-                        transform: "translateX(-50%)",
                         marginBottom: isTerminalDown ? "0" : "15px",
-                        marginTop: isTerminalDown ? "15px" : "0",
-                        backgroundColor: "#000000",
-                        color: "#00FF00",
-                        borderRadius: "4px",
-                        border: "2px solid #00FF00",
-                        boxShadow: "0 0 15px rgba(0, 255, 0, 0.4)",
-                        width: "240px",
-                        textAlign: "left",
-                        fontSize: "13px",
-                        fontFamily: "'Courier New', Courier, monospace",
-                        lineHeight: "1.4",
-                        pointerEvents: "none",
-                        overflow: "hidden"
+                        marginTop: isTerminalDown ? "15px" : "0"
                     }}>
-                        <div style={{
-                            backgroundColor: "#00FF00",
-                            color: "#000000",
-                            padding: "2px 6px",
-                            fontSize: "10px",
-                            fontWeight: "bold",
-                            display: "flex",
-                            justifyContent: "space-between"
-                        }}>
+                        <div className={styles.terminalHeader}>
                             <span>ROBOT_TERM.EXE</span>
                             <span>X</span>
                         </div>
-                        <div style={{ padding: "10px" }}>
+                        <div className={styles.terminalBody}>
                             <span style={{ marginRight: "5px" }}>&gt;</span>
                             {displayedText}
-                            <span style={{ animation: "blink 1s step-end infinite", fontWeight: "bold", marginLeft: "2px" }}>_</span>
+                            <span className={styles.terminalCursor}>_</span>
                         </div>
                     </div>
                 )}
