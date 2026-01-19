@@ -120,10 +120,93 @@ const RECOMMENDATIONS = [
   },
 ];
 
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Vimal Kumar",
+  "alternateName": "VimalVerma",
+  "url": "https://vimalverma.in",
+  "jobTitle": "Software Developer",
+  "knowsAbout": SKILLS,
+  "description": "Software Developer and Web App Creator specializing in React, Next.js, and NFC technology."
+};
+
+const ProjectCard = ({ project }) => (
+  <a
+    href={project.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={styles.card}
+    data-narrate={`Project: ${project.name}. ${project.desc}`}
+    data-section="Projects"
+  >
+    <div className={styles.cardHeader}>
+      <Image
+        src={project.logo}
+        alt={`${project.name} Logo`}
+        width={60}
+        height={60}
+        className={styles.cardLogo}
+      />
+      <h3>{project.name} &rarr;</h3>
+    </div>
+    <p>{project.desc}</p>
+    <div className={styles.projectTags}>
+      {project.tags.map((tag) => (
+        <span key={tag} className={styles.projectTag}>{tag}</span>
+      ))}
+    </div>
+    <span className={styles.cardButton}>View Project</span>
+  </a>
+);
+
+const TimelineItem = ({ title, subtitle, period, desc }) => (
+  <div className={styles.timelineItem}>
+    <div className={styles.timelineContent}>
+      <h3>{title}</h3>
+      <h4>{subtitle}</h4>
+      <span className={styles.period}>{period}</span>
+      <p>{desc}</p>
+    </div>
+  </div>
+);
+
+const BlogCard = ({ blog }) => (
+  <a
+    href={blog.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={styles.card}
+    data-narrate={`Article: ${blog.title}`}
+    data-section="Blog"
+  >
+    {blog.cover_image && (
+      <Image
+        src={blog.cover_image}
+        alt={blog.title}
+        width={800}
+        height={400}
+        className={styles.blogImage}
+        placeholder="blur"
+        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+      />
+    )}
+    <h3>{blog.title} &rarr;</h3>
+    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
+      {new Date(blog.published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+      <span style={{ margin: "0 8px" }}>•</span>
+      {blog.positive_reactions_count} Likes
+    </p>
+    <p>{blog.description}</p>
+    <span className={styles.cardButton}>Read Article</span>
+  </a>
+);
+
 export default function Home() {
   const [isDark, setIsDark] = useState(false);
   const [formStatus, setFormStatus] = useState(null);
   const [blogs, setBlogs] = useState([]);
+  const [loadingBlogs, setLoadingBlogs] = useState(true);
   const recommendationsRef = useRef(null);
 
   useEffect(() => {
@@ -135,7 +218,8 @@ export default function Home() {
           setBlogs(sorted);
         }
       })
-      .catch((err) => console.error("Failed to fetch blogs", err));
+      .catch((err) => console.error("Failed to fetch blogs", err))
+      .finally(() => setLoadingBlogs(false));
   }, []);
 
   const scrollRecommendations = (direction) => {
@@ -176,20 +260,9 @@ export default function Home() {
     });
   };
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Vimal Kumar",
-    "alternateName": "VimalVerma",
-    "url": "https://vdev.in",
-    "jobTitle": "Software Developer",
-    "knowsAbout": SKILLS,
-    "description": "Software Developer and Web App Creator specializing in React, Next.js, and NFC technology."
-  };
-
   return (
     <div className={`${styles.page} ${isDark ? styles.darkMode : ""}`}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
       <RobotGuide isDark={isDark} />
       <Header isDark={isDark} toggleTheme={toggleTheme} />
       <main className={styles.main}>
@@ -219,34 +292,7 @@ export default function Home() {
           <h2>My Projects</h2>
           <div className={styles.grid}>
             {PROJECTS.map((project) => (
-              <a
-                key={project.name}
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.card}
-                data-narrate={`Project: ${project.name}. ${project.desc}`}
-                data-section="Projects"
-
-              >
-                <div className={styles.cardHeader}>
-                  <Image
-                    src={project.logo}
-                    alt={`${project.name} Logo`}
-                    width={60}
-                    height={60}
-                    className={styles.cardLogo}
-                  />
-                  <h3>{project.name} &rarr;</h3>
-                </div>
-                <p>{project.desc}</p>
-                <div className={styles.projectTags}>
-                  {project.tags.map((tag) => (
-                    <span key={tag} className={styles.projectTag}>{tag}</span>
-                  ))}
-                </div>
-                <span className={styles.cardButton}>View Project</span>
-              </a>
+              <ProjectCard key={project.name} project={project} />
             ))}
           </div>
         </div>
@@ -266,14 +312,13 @@ export default function Home() {
           <h2>Work Experience</h2>
           <div className={styles.timeline}>
             {EXPERIENCE.map((job, index) => (
-              <div key={index} className={styles.timelineItem}>
-                <div className={styles.timelineContent}>
-                  <h3>{job.role}</h3>
-                  <h4>{job.company}</h4>
-                  <span className={styles.period}>{job.period}</span>
-                  <p>{job.desc}</p>
-                </div>
-              </div>
+              <TimelineItem
+                key={index}
+                title={job.role}
+                subtitle={job.company}
+                period={job.period}
+                desc={job.desc}
+              />
             ))}
           </div>
         </div>
@@ -282,14 +327,13 @@ export default function Home() {
           <h2>Education</h2>
           <div className={styles.timeline}>
             {EDUCATION.map((edu, index) => (
-              <div key={index} className={styles.timelineItem}>
-                <div className={styles.timelineContent}>
-                  <h3>{edu.degree}</h3>
-                  <h4>{edu.institution}</h4>
-                  <span className={styles.period}>{edu.year}</span>
-                  <p>{edu.desc}</p>
-                </div>
-              </div>
+              <TimelineItem
+                key={index}
+                title={edu.degree}
+                subtitle={edu.institution}
+                period={edu.year}
+                desc={edu.desc}
+              />
             ))}
           </div>
         </div>
@@ -319,37 +363,11 @@ export default function Home() {
         <div id="blog" className={styles.blogSection} data-narrate="Read my latest articles from Dev.to." data-section="Blog">
           <h2>Latest Articles</h2>
           <div className={styles.grid}>
-            {blogs.slice(0, 4).map((blog) => (
-              <a
-                key={blog.id}
-                href={blog.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.card}
-                data-narrate={`Article: ${blog.title}`}
-                data-section="Blog"
-              >
-                {blog.cover_image && (
-                  <Image
-                    src={blog.cover_image}
-                    alt={blog.title}
-                    width={800}
-                    height={400}
-                    className={styles.blogImage}
-                    placeholder="blur"
-                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-                  />
-                )}
-                <h3>{blog.title} &rarr;</h3>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
-                  {new Date(blog.published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
-                  <span style={{ margin: "0 8px" }}>•</span>
-                  {blog.positive_reactions_count} Likes
-                </p>
-                <p>{blog.description}</p>
-                <span className={styles.cardButton}>Read Article</span>
-              </a>
-            ))}
+            {loadingBlogs ? (
+              <p style={{ textAlign: "center", width: "100%", color: "var(--text-secondary)" }}>Loading articles...</p>
+            ) : (
+              blogs.slice(0, 4).map((blog) => <BlogCard key={blog.id} blog={blog} />)
+            )}
           </div>
           <div style={{ textAlign: "center", marginTop: "2rem" }}>
             <a

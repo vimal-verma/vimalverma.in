@@ -77,6 +77,8 @@
   background: linear-gradient(45deg, #00F2FF, #0078FF);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .navLink {
