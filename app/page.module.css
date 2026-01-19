@@ -239,7 +239,9 @@
 }
 
 .ctaButton {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-top: 1.5rem;
   padding: 0.8rem 2rem;
   background-color: var(--text-primary);
@@ -266,7 +268,8 @@
 .experienceSection h2,
 .educationSection h2,
 .certificationSection h2,
-.blogSection h2 {
+.blogSection h2,
+.recommendationsSection h2 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
@@ -769,3 +772,68 @@
   pointer-events: none;
   overflow: hidden;
 }
+
+/* Carousel */
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 10px;
+}
+
+.carouselTrack {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 1.5rem;
+  padding: 1rem 0.5rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+
+.carouselTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.carouselCard {
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .carouselCard {
+    flex: 0 0 calc(50% - 0.75rem);
+  }
+}
+
+.carouselNavBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: var(--card-shadow);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+.carouselNavBtn:hover {
+  background: var(--button-hover);
+  transform: translateY(-50%) scale(1.1);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.prevBtn { left: -15px; }
+.nextBtn { right: -15px; }

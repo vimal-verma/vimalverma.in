@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import styles from "./page.module.css";
 import Header from "./components/Header";
@@ -102,10 +102,29 @@ const CERTIFICATIONS = [
   },
 ];
 
+const RECOMMENDATIONS = [
+  {
+    name: "Akshay kumar singh",
+    role: "Ecommerce Growth Strategist | 7+ Years in eCommerce & Performance Marketing | Scaling Sales with Google Ads & High-ROAS PPC",
+    text: "Vimal is sincere, hardworking, technically sound, and result-oriented. He has also shown an impressive skill towards being a diligent task handler as well as collaborating with the team and is a seamless part of the team during his tenure. He has shown the ability to incorporate the ideologies and concepts of the company and being a strong team player and contributing towards successful result-oriented goals.",
+  },
+  {
+    name: "Vishal Roy",
+    role: "Lead Software Engineer@ IndiaMART InterMESH Ltd.",
+    text: "He is the kind of person everyone wants to be around.His aura and indepth knowledge in the field of developmemt will surely boost anyone's interest and dedication towards development. He is a passionate coder and I have learnt a lot from him during our combined project and in our small talks 😄",
+  },
+  {
+    name: "Abhishek Kumar",
+    role: "Data Analyst @Concentrix | Ex-Deloitte | IIIT Ranchi'22 | Business Intelligence | Transforming Data into Actionable Insights through Design-Led Analytics",
+    text: "Vimal is my project partner. He is hard working and an enthusiastic learner. His dedication towards learning new technologies and implementing them is something that is really admirable. He possess a good teamwork skill, he is always ready to mentor & guide. His dedication & knowledge in web development field is awesome. I had the pleasure of working with him and collaborating on several project teams.vimal is a strong and goal oriented team player; with every problem there was a solution.Highly recommended.he will be an asset to any company.",
+  },
+];
+
 export default function Home() {
   const [isDark, setIsDark] = useState(false);
   const [formStatus, setFormStatus] = useState(null);
   const [blogs, setBlogs] = useState([]);
+  const recommendationsRef = useRef(null);
 
   useEffect(() => {
     fetch("https://dev.to/api/articles?username=vimal")
@@ -118,6 +137,17 @@ export default function Home() {
       })
       .catch((err) => console.error("Failed to fetch blogs", err));
   }, []);
+
+  const scrollRecommendations = (direction) => {
+    if (recommendationsRef.current) {
+      const container = recommendationsRef.current;
+      const scrollAmount = container.clientWidth / (window.innerWidth > 768 ? 2 : 1);
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -320,6 +350,62 @@ export default function Home() {
                 <span className={styles.cardButton}>Read Article</span>
               </a>
             ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: "2rem" }}>
+            <a
+              href="https://dev.to/vimal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.ctaButton}
+            >
+              View more Articles
+            </a>
+          </div>
+        </div>
+
+        <div id="recommendations" className={styles.recommendationsSection} data-narrate="Here is what people are saying about Vimal on LinkedIn." data-section="Recommendations">
+          <h2>LinkedIn Recommendations</h2>
+          <div className={styles.carouselContainer}>
+            <button
+              className={`${styles.carouselNavBtn} ${styles.prevBtn}`}
+              onClick={() => scrollRecommendations('left')}
+              aria-label="Previous Recommendation"
+            >
+              &larr;
+            </button>
+            <div className={styles.carouselTrack} ref={recommendationsRef}>
+              {RECOMMENDATIONS.map((rec, index) => (
+                <div
+                  key={index}
+                  className={`${styles.card} ${styles.carouselCard}`}
+                  data-narrate={`Recommendation from ${rec.name}`}
+                  data-section="Recommendations"
+                >
+                  <p style={{ fontStyle: "italic", marginBottom: "1.5rem", color: "var(--text-secondary)", lineHeight: "1.6" }}>&quot;{rec.text}&quot;</p>
+                  <div style={{ marginTop: "auto", borderTop: "1px solid var(--card-border)", paddingTop: "1rem", width: "100%" }}>
+                    <h3 style={{ fontSize: "1.1rem", marginBottom: "0.2rem" }}>{rec.name}</h3>
+                    <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>{rec.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button
+              className={`${styles.carouselNavBtn} ${styles.nextBtn}`}
+              onClick={() => scrollRecommendations('right')}
+              aria-label="Next Recommendation"
+            >
+              &rarr;
+            </button>
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <a
+              href="https://www.linkedin.com/in/vimal-verma/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.ctaButton}
+            >
+              View on LinkedIn
+            </a>
           </div>
         </div>
 

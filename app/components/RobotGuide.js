@@ -72,7 +72,8 @@ const SECTION_CONTAINER_IDS = [
     "education",
     "certifications",
     "blog",
-    "contact"
+    "contact",
+    "recommendations"
 ];
 
 const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDoubleClick, onMouseDown, onMouseMove, isSpinning, isBlinking, eyeOffset, isWiggling, isDancing, isMoving, ...props }) => {
