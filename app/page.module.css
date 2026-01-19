@@ -262,7 +262,11 @@
 
 /* Projects Section */
 .projectsSection h2,
-.skillsSection h2 {
+.skillsSection h2,
+.experienceSection h2,
+.educationSection h2,
+.certificationSection h2,
+.blogSection h2 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
@@ -285,7 +289,8 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -295,16 +300,138 @@
   border-color: #00F2FF;
 }
 
+.cardLogo {
+  border-radius: 10px;
+  background-color: var(--button-bg);
+  padding: 6px;
+  object-fit: contain;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.card:hover .cardLogo {
+  transform: scale(1.1);
+  background-color: var(--button-hover);
+}
+
+.blogImage {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
 .card h3 {
   font-size: 1.25rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   font-weight: 600;
+  line-height: 1.2;
+}
+
+.projectTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  margin-bottom: 1.5rem;
+}
+
+.projectTag {
+  font-size: 0.75rem;
+  background-color: rgba(128, 128, 128, 0.1);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 500;
 }
 
 .card p {
   font-size: 0.95rem;
   color: var(--text-secondary);
   line-height: 1.5;
+}
+
+.cardButton {
+  margin-top: auto;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--text-primary);
+  color: var(--bg-color);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+}
+
+.card:hover .cardButton {
+  transform: translateY(-2px);
+  background-color: var(--accent-color);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3);
+}
+
+/* Experience Section */
+.timeline {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-left: 1rem;
+}
+
+.timelineItem {
+  position: relative;
+  padding-left: 2rem;
+  padding-bottom: 2.5rem;
+  border-left: 2px solid var(--card-border);
+}
+
+.timelineItem:last-child {
+  border-left: 2px solid transparent;
+}
+
+.timelineItem::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  box-shadow: 0 0 0 4px var(--bg-color);
+}
+
+.timelineContent h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.timelineContent h4 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+.period {
+  display: inline-block;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.6rem;
+  background: var(--button-bg);
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  color: var(--text-secondary);
 }
 
 /* Skills Section */

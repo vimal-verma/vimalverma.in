@@ -64,6 +64,17 @@ const Mouth = ({ expression }) => {
     return <path id="Vector_9" d="M70.5 119.5C73.8137 119.5 76.5 116.814 76.5 113.5C76.5 110.186 73.8137 107.5 70.5 107.5C67.1863 107.5 64.5 110.186 64.5 113.5C64.5 116.814 67.1863 119.5 70.5 119.5Z" stroke="#00F2FF" strokeWidth="2" />;
 };
 
+const SECTION_CONTAINER_IDS = [
+    "introduction",
+    "projects",
+    "skills",
+    "experience",
+    "education",
+    "certifications",
+    "blog",
+    "contact"
+];
+
 const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDoubleClick, onMouseDown, onMouseMove, isSpinning, isBlinking, eyeOffset, isWiggling, isDancing, isMoving, ...props }) => {
     const [isHovered, setIsHovered] = useState(false);
 
@@ -340,8 +351,11 @@ export default function RobotGuide({ isDark }) {
                 }
                 currentSectionRef.current = sectionId;
                 highlightedElementRef.current = sectionEl;
-                sectionEl.style.outline = "2px solid #00F2FF";
-                sectionEl.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.3)";
+                
+                if (!SECTION_CONTAINER_IDS.includes(sectionEl.id)) {
+                    sectionEl.style.outline = "2px solid #00F2FF";
+                    sectionEl.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.3)";
+                }
 
                 const rect = sectionEl.getBoundingClientRect();
                 setRobotPosition({

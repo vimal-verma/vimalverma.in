@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import styles from "./page.module.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -16,16 +17,107 @@ const SKILLS = [
   "Web APIs",
 ];
 
+const EXPERIENCE = [
+  {
+    company: "Tech Solutions Inc.",
+    role: "Senior Frontend Developer",
+    period: "2023 - Present",
+    desc: "Leading the frontend team in building scalable web applications using Next.js and React.",
+  },
+  {
+    company: "Creative Web Agency",
+    role: "Web Developer",
+    period: "2021 - 2023",
+    desc: "Developed responsive websites and e-commerce platforms for various clients.",
+  },
+];
+
+const EDUCATION = [
+  {
+    degree: "Bachelor of Technology in Computer Science",
+    institution: "State Technical University",
+    year: "2017 - 2021",
+    desc: "Focused on Software Engineering and Web Technologies. Graduated with Honors.",
+  },
+  {
+    degree: "Higher Secondary Certificate",
+    institution: "City High School",
+    year: "2015 - 2017",
+    desc: "Major in Physics, Chemistry, and Mathematics.",
+  },
+];
+
 const PROJECTS = [
-  { name: "NFCBuzz.com", url: "https://nfcbuzz.com", desc: "Explore NFC technology." },
-  { name: "WebNfc.org", url: "https://webnfc.org", desc: "Web NFC resources." },
-  { name: "KnowBihar.in", url: "https://knowbihar.in", desc: "Insights about Bihar." },
-  { name: "Vdev.in", url: "https://vdev.in", desc: "My personal development hub." },
+  {
+    name: "NFCBuzz.com",
+    url: "https://nfcbuzz.com",
+    desc: "A comprehensive platform to explore NFC technology, tools, and use cases for modern web applications.",
+    logo: "/nfcbuzz.png",
+    tags: ["Next.js", "Web NFC", "PWA"]
+  },
+  {
+    name: "WebNfc.org",
+    url: "https://webnfc.org",
+    desc: "Educational resource and documentation hub for the Web NFC API standards and implementation.",
+    logo: "/webnfc.jpg",
+    tags: ["React", "Documentation", "MDX"]
+  },
+  {
+    name: "KnowBihar.in",
+    url: "https://knowbihar.in",
+    desc: "A content-rich portal providing historical insights, tourism guides, and cultural information about Bihar.",
+    logo: "/knowbihar.png",
+    tags: ["Next.js", "Content", "SEO"]
+  },
+  {
+    name: "Vdev.in",
+    url: "https://vdev.in",
+    desc: "My personal portfolio and development hub showcasing my latest work and experiments.",
+    logo: "/vdev.png",
+    tags: ["Portfolio", "React", "Animation"]
+  },
+  {
+    name: "BioDataMaker.org",
+    url: "https://biodatamaker.org",
+    desc: "An intuitive tool to create, customize, and download professional bio-data for marriage or jobs.",
+    logo: "/biodatamaker.jpeg",
+    tags: ["React", "PDF Generation", "Forms"]
+  },
+];
+
+const CERTIFICATIONS = [
+  {
+    title: "Meta Frontend Developer",
+    issuer: "Coursera",
+    date: "2023",
+    url: "#",
+    desc: "Advanced React, UI/UX design, and frontend development best practices.",
+  },
+  {
+    title: "AWS Certified Cloud Practitioner",
+    issuer: "Amazon Web Services",
+    date: "2022",
+    url: "#",
+    desc: "Fundamental understanding of AWS cloud platform and basic security concepts.",
+  },
 ];
 
 export default function Home() {
   const [isDark, setIsDark] = useState(false);
   const [formStatus, setFormStatus] = useState(null);
+  const [blogs, setBlogs] = useState([]);
+
+  useEffect(() => {
+    fetch("https://dev.to/api/articles?username=vimal")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const sorted = data.sort((a, b) => b.positive_reactions_count - a.positive_reactions_count);
+          setBlogs(sorted);
+        }
+      })
+      .catch((err) => console.error("Failed to fetch blogs", err));
+  }, []);
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -93,17 +185,6 @@ export default function Home() {
           </a>
         </div>
 
-        <div id="skills" className={styles.skillsSection} data-narrate="Here are the skills and technologies Vimal works with, like React, Next JS, and Node JS." data-section="Skills">
-          <h2>Skills & Technologies</h2>
-          <div className={styles.skillsList}>
-            {SKILLS.map((skill) => (
-              <span key={skill} className={styles.skillBadge} data-narrate={`Skill: ${skill}`} data-section="Skills">
-                {skill}
-              </span>
-            ))}
-          </div>
-        </div>
-
         <div id="projects" className={styles.projectsSection} data-narrate="These are some of the projects built by Vimal. Hover over them to learn more." data-section="Projects">
           <h2>My Projects</h2>
           <div className={styles.grid}>
@@ -118,8 +199,125 @@ export default function Home() {
                 data-section="Projects"
 
               >
-                <h3>{project.name} &rarr;</h3>
+                <div className={styles.cardHeader}>
+                  <Image
+                    src={project.logo}
+                    alt={`${project.name} Logo`}
+                    width={60}
+                    height={60}
+                    className={styles.cardLogo}
+                  />
+                  <h3>{project.name} &rarr;</h3>
+                </div>
                 <p>{project.desc}</p>
+                <div className={styles.projectTags}>
+                  {project.tags.map((tag) => (
+                    <span key={tag} className={styles.projectTag}>{tag}</span>
+                  ))}
+                </div>
+                <span className={styles.cardButton}>View Project</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div id="skills" className={styles.skillsSection} data-narrate="Here are the skills and technologies Vimal works with, like React, Next JS, and Node JS." data-section="Skills">
+          <h2>Skills & Technologies</h2>
+          <div className={styles.skillsList}>
+            {SKILLS.map((skill) => (
+              <span key={skill} className={styles.skillBadge} data-narrate={`Skill: ${skill}`} data-section="Skills">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div id="experience" className={styles.experienceSection} data-narrate="Here is Vimal's professional work experience." data-section="Experience">
+          <h2>Work Experience</h2>
+          <div className={styles.timeline}>
+            {EXPERIENCE.map((job, index) => (
+              <div key={index} className={styles.timelineItem}>
+                <div className={styles.timelineContent}>
+                  <h3>{job.role}</h3>
+                  <h4>{job.company}</h4>
+                  <span className={styles.period}>{job.period}</span>
+                  <p>{job.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div id="education" className={styles.educationSection} data-narrate="Vimal's educational background." data-section="Education">
+          <h2>Education</h2>
+          <div className={styles.timeline}>
+            {EDUCATION.map((edu, index) => (
+              <div key={index} className={styles.timelineItem}>
+                <div className={styles.timelineContent}>
+                  <h3>{edu.degree}</h3>
+                  <h4>{edu.institution}</h4>
+                  <span className={styles.period}>{edu.year}</span>
+                  <p>{edu.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div id="certifications" className={styles.certificationSection} data-narrate="Certifications earned by Vimal." data-section="Certifications">
+          <h2>Certifications</h2>
+          <div className={styles.grid}>
+            {CERTIFICATIONS.map((cert, index) => (
+              <a
+                key={index}
+                href={cert.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.card}
+                data-narrate={`Certification: ${cert.title}`}
+                data-section="Certifications"
+              >
+                <h3>{cert.title} &rarr;</h3>
+                <p style={{ fontWeight: 500, color: "var(--text-primary)", marginBottom: "0.5rem" }}>{cert.issuer} &bull; {cert.date}</p>
+                <p>{cert.desc}</p>
+                <span className={styles.cardButton}>View Certificate</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div id="blog" className={styles.blogSection} data-narrate="Read my latest articles from Dev.to." data-section="Blog">
+          <h2>Latest Articles</h2>
+          <div className={styles.grid}>
+            {blogs.slice(0, 4).map((blog) => (
+              <a
+                key={blog.id}
+                href={blog.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.card}
+                data-narrate={`Article: ${blog.title}`}
+                data-section="Blog"
+              >
+                {blog.cover_image && (
+                  <Image
+                    src={blog.cover_image}
+                    alt={blog.title}
+                    width={800}
+                    height={400}
+                    className={styles.blogImage}
+                    placeholder="blur"
+                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+                  />
+                )}
+                <h3>{blog.title} &rarr;</h3>
+                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
+                  {new Date(blog.published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                  <span style={{ margin: "0 8px" }}>•</span>
+                  {blog.positive_reactions_count} Likes
+                </p>
+                <p>{blog.description}</p>
+                <span className={styles.cardButton}>Read Article</span>
               </a>
             ))}
           </div>
