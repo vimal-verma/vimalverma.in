@@ -139,6 +139,7 @@ const ProjectCard = ({ project }) => (
     className={styles.card}
     data-narrate={`Project: ${project.name}. ${project.desc}`}
     data-section="Projects"
+    aria-label={`View project ${project.name}`}
   >
     <div className={styles.cardHeader}>
       <Image
@@ -179,6 +180,7 @@ const BlogCard = ({ blog }) => (
     className={styles.card}
     data-narrate={`Article: ${blog.title}`}
     data-section="Blog"
+    aria-label={`Read article: ${blog.title}`}
   >
     {blog.cover_image && (
       <Image
@@ -210,16 +212,20 @@ export default function Home() {
   const recommendationsRef = useRef(null);
 
   useEffect(() => {
+    let isMounted = true;
     fetch("https://dev.to/api/articles?username=vimal")
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) {
+        if (isMounted && Array.isArray(data)) {
           const sorted = data.sort((a, b) => b.positive_reactions_count - a.positive_reactions_count);
           setBlogs(sorted);
         }
       })
       .catch((err) => console.error("Failed to fetch blogs", err))
-      .finally(() => setLoadingBlogs(false));
+      .finally(() => {
+        if (isMounted) setLoadingBlogs(false);
+      });
+    return () => { isMounted = false; };
   }, []);
 
   const scrollRecommendations = (direction) => {
@@ -250,6 +256,15 @@ export default function Home() {
     } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
       setIsDark(true);
     }
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e) => {
+      if (!localStorage.getItem("theme")) {
+        setIsDark(e.matches);
+      }
+    };
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   const toggleTheme = () => {
@@ -266,7 +281,7 @@ export default function Home() {
       <RobotGuide isDark={isDark} />
       <Header isDark={isDark} toggleTheme={toggleTheme} />
       <main className={styles.main}>
-        <div id="introduction" className={styles.hero} data-narrate="This is the hero section. Vimal is a Software Developer and Web App Creator." data-section="Introduction">
+        <section id="introduction" className={styles.hero} data-narrate="Welcome! I am Vimal's virtual assistant. Let me introduce you to Vimal, a passionate Software Developer and Web App Creator." data-section="Introduction">
           <h1 className={`${styles.title} ${styles.animateFadeUp} ${styles.delay1}`} style={{ background: "linear-gradient(90deg, #00F2FF, #0078FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}>
             Vimal Kumar <span className={styles.handle} style={{ WebkitTextFillColor: isDark ? "#888" : "#666", fontSize: "0.6em" }}>(VimalVerma)</span>
           </h1>
@@ -281,14 +296,16 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             className={`${styles.ctaButton} ${styles.animateFadeUp} ${styles.delay3}`}
-            data-narrate="Click here to download the resume."
+            data-narrate="You can download Vimal's full resume here to see his complete professional journey."
             data-section="Resume"
           >
             Download Resume
           </a>
-        </div>
+        </section>
 
-        <div id="projects" className={styles.projectsSection} data-narrate="These are some of the projects built by Vimal. Hover over them to learn more." data-section="Projects">
+        <section className={styles.contentSection}>
+
+        <div id="projects" className={styles.projectsSection} data-narrate="Here are some of the exciting projects Vimal has built. Feel free to hover over them for details." data-section="Projects">
           <h2>My Projects</h2>
           <div className={styles.grid}>
             {PROJECTS.map((project) => (
@@ -297,7 +314,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div id="skills" className={styles.skillsSection} data-narrate="Here are the skills and technologies Vimal works with, like React, Next JS, and Node JS." data-section="Skills">
+        <div id="skills" className={styles.skillsSection} data-narrate="Vimal has a diverse skill set, ranging from React and Next JS to NFC Technology." data-section="Skills">
           <h2>Skills & Technologies</h2>
           <div className={styles.skillsList}>
             {SKILLS.map((skill) => (
@@ -308,7 +325,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div id="experience" className={styles.experienceSection} data-narrate="Here is Vimal's professional work experience." data-section="Experience">
+        <div id="experience" className={styles.experienceSection} data-narrate="Here is a timeline of Vimal's professional work experience and career growth." data-section="Experience">
           <h2>Work Experience</h2>
           <div className={styles.timeline}>
             {EXPERIENCE.map((job, index) => (
@@ -378,10 +395,11 @@ export default function Home() {
             >
               View more Articles
             </a>
-          </div>
-        </div>
+            </div>
+            </div>
+        </section>
 
-        <div id="recommendations" className={styles.recommendationsSection} data-narrate="Here is what people are saying about Vimal on LinkedIn." data-section="Recommendations">
+        <section id="recommendations" className={styles.recommendationsSection} data-narrate="Here is what people are saying about Vimal on LinkedIn." data-section="Recommendations">
           <h2>LinkedIn Recommendations</h2>
           <div className={styles.carouselContainer}>
             <button
@@ -425,9 +443,9 @@ export default function Home() {
               View on LinkedIn
             </a>
           </div>
-        </div>
+        </section>
 
-        <div id="contact" style={{ padding: "80px 20px", textAlign: "center" }} data-narrate="Feel free to send me a message using this contact form." data-section="Contact">
+        <section id="contact" style={{ padding: "80px 20px", textAlign: "center" }} data-narrate="Ready to collaborate? Use this form to send a message directly to Vimal." data-section="Contact">
           <h2>Get In Touch</h2>
           <p style={{ marginBottom: "40px", opacity: 0.8, maxWidth: "600px", margin: "0 auto 40px" }}>
             Have a project in mind or just want to say hi? Fill out the form below and I&apos;ll get back to you as soon as possible.
@@ -437,23 +455,23 @@ export default function Home() {
             <form onSubmit={handleContactSubmit}>
               <div className={styles.formGroup} >
                 <label htmlFor="name" className={styles.formLabel}>Name</label>
-                <input type="text" id="name" name="name" required className={styles.formInput} placeholder="Your Name" data-narrate="Feel free to send me a message using this contact form." data-section="Contact" />
+                <input type="text" id="name" name="name" required className={styles.formInput} placeholder="Your Name" data-narrate="Enter your name here." data-section="Contact" />
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="email" className={styles.formLabel}>Email</label>
-                <input type="email" id="email" name="email" required className={styles.formInput} placeholder="your@email.com" data-narrate="Feel free to send me a message using this contact form." data-section="Contact" />
+                <input type="email" id="email" name="email" required className={styles.formInput} placeholder="your@email.com" data-narrate="Enter your email address so Vimal can reply." data-section="Contact" />
               </div>
               <div className={styles.formGroup}>
                 <label htmlFor="message" className={styles.formLabel}>Message</label>
-                <textarea id="message" name="message" required rows="5" className={styles.formTextarea} placeholder="Your Message" data-narrate="Feel free to send me a message using this contact form." data-section="Contact"></textarea>
+                <textarea id="message" name="message" required rows="5" className={styles.formTextarea} placeholder="Your Message" data-narrate="Type your message or project details here." data-section="Contact"></textarea>
               </div>
-              <button type="submit" className={styles.submitBtn} disabled={formStatus === 'submitting' || formStatus === 'success'}>
+              <button type="submit" className={styles.submitBtn} disabled={formStatus === 'submitting' || formStatus === 'success'} aria-live="polite">
                 {formStatus === 'submitting' ? 'Sending...' : (formStatus === 'success' ? 'Message Sent!' : 'Send Message')}
               </button>
-              {formStatus === 'success' && <div className={styles.successMsg}>Thanks for reaching out! I&apos;ll get back to you soon.</div>}
+              {formStatus === 'success' && <div className={styles.successMsg} role="alert">Thanks for reaching out! I&apos;ll get back to you soon.</div>}
             </form>
           </div>
-        </div>
+        </section>
       </main>
       <Footer />
     </div>

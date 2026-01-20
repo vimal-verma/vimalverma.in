@@ -56,12 +56,12 @@ const Mouth = ({ expression }) => {
     //         </path>
     //     );
     // }
-    if (expression === "happy") return <path id="Vector_6" d="M55.5 110.5C65.5 117.167 75.5 117.167 85.5 110.5" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" />;
+    if (expression === "happy") return <path id="Vector_6" d="M55.5 85.5C65.5 92.167 75.5 92.167 85.5 85.5" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" />;
     if (expression === "sleepy") return <path id="Zzz" d="M111.608 34.5V32.6747L118.866 22.4901H111.594V19.9545H122.73V21.7798L115.464 31.9645H122.744V34.5H111.608ZM124.99 34.5V32.696L130.331 26.0838V26.0057H125.175V23.5909H133.975V25.5582L128.961 32.0071V32.0852H134.159V34.5H124.99ZM136.416 34.5V32.696L141.757 26.0838V26.0057H136.601V23.5909H145.401V25.5582L140.386 32.0071V32.0852H145.585V34.5H136.416Z" fill="#00F2FF" />;
-    if (expression === "excited") return <path id="Vector_3" d="M55.5 110.5L62.5 103.5L70.5 110.5L78.5 103.5L85.5 110.5" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" />;
-    if (expression === "confused") return <path d="M65 112 Q72 108 80 112 T95 112" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />;
-    if (expression === "love") return <path d="M65 110 Q70.5 118 76 110" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />;
-    return <path id="Vector_9" d="M70.5 119.5C73.8137 119.5 76.5 116.814 76.5 113.5C76.5 110.186 73.8137 107.5 70.5 107.5C67.1863 107.5 64.5 110.186 64.5 113.5C64.5 116.814 67.1863 119.5 70.5 119.5Z" stroke="#00F2FF" strokeWidth="2" />;
+    if (expression === "excited") return <path id="Vector_3" d="M55.5 85.5L62.5 78.5L70.5 85.5L78.5 78.5L85.5 85.5" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" />;
+    if (expression === "confused") return <path d="M65 87 Q72 83 80 87 T95 87" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />;
+    if (expression === "love") return <path d="M65 85 Q70.5 93 76 85" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />;
+    return <path id="Vector_9" d="M70.5 94.5C73.8137 94.5 76.5 91.814 76.5 88.5C76.5 85.186 73.8137 82.5 70.5 82.5C67.1863 82.5 64.5 85.186 64.5 88.5C64.5 91.814 67.1863 94.5 70.5 94.5Z" stroke="#00F2FF" strokeWidth="2" />;
 };
 
 const SECTION_CONTAINER_IDS = [
@@ -76,7 +76,7 @@ const SECTION_CONTAINER_IDS = [
     "recommendations"
 ];
 
-const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDoubleClick, onMouseDown, onMouseMove, isSpinning, isBlinking, eyeOffset, isWiggling, isDancing, isMoving, ...props }) => {
+const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDoubleClick, onMouseDown, onMouseMove, isSpinning, isBlinking, eyeOffset, isWiggling, isDancing, isMoving, leanAngle = 0, isDragging, isIntroMode, ...props }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
@@ -91,9 +91,10 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
             {...props}
             className={styles.robotSvg}
             style={{
-                transform: isSpinning ? "rotate(360deg)" : "rotate(0deg)",
+                transform: isSpinning ? "rotate(360deg)" : `rotate(${leanAngle}deg)`,
                 transformOrigin: "center",
-                animation: isDancing ? "dance 0.6s ease-in-out infinite" : (isMoving ? "fly 1s ease-in-out infinite" : "none")
+                cursor: isDragging ? "grabbing" : "grab",
+                animation: isDancing ? "dance 0.6s ease-in-out infinite" : (isMoving ? "fly 1s ease-in-out infinite" : "fly 3s ease-in-out infinite")
             }}
         >
             <defs>
@@ -104,30 +105,70 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
             </defs>
             <g style={{ animation: isDancing ? "rainbow 2s linear infinite" : "none" }}>
                 <g id="robot">
+                    {/* Ears / Headphones */}
+                    <rect x="-5" y="60" width="12" height="24" rx="4" fill={isDark ? "#888" : "#333"} />
+                    <rect x="134" y="60" width="12" height="24" rx="4" fill={isDark ? "#888" : "#333"} />
+
                     {/* Antenna */}
-                    <g style={{ transformOrigin: "70.5px 0px", animation: isWiggling ? "wiggle 0.5s ease-in-out infinite" : "none" }}>
-                        <line x1="70.5" y1="0" x2="70.5" y2="-20" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="4" strokeLinecap="round" />
-                        <circle cx="70.5" cy="-20" r="5" fill="#FF4444" />
-                    </g>
-                    {/* Legs */}
-                    <g style={{ transformOrigin: "50px 130px", transform: isMoving ? "rotate(25deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
-                        <path d="M50 130 V160 H40" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                    </g>
-                    <g style={{ transformOrigin: "98px 130px", transform: isMoving ? "rotate(25deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
-                        <path d="M98 130 V160 H108" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                    </g>
-                    {/* Jetpack Flame */}
-                    {isMoving && (
-                        <g style={{ animation: "flicker 0.1s infinite alternate" }}>
-                            <path d="M60 160 Q70 190 80 160" fill="#FF9900" opacity="0.8" />
-                            <path d="M65 160 Q70 180 75 160" fill="#FFFF00" opacity="0.9" />
+                    {!isIntroMode ? (
+                        <g style={{ transformOrigin: "70.5px 0px", animation: isWiggling ? "wiggle 0.5s ease-in-out infinite" : "none" }}>
+                            <line x1="70.5" y1="0" x2="70.5" y2="-25" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="4" strokeLinecap="round" />
+                            <circle cx="70.5" cy="-25" r="6" fill="#FF4444">
+                                <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite" />
+                            </circle>
+                        </g>
+                    ) : (
+                        /* Top Hat for Intro Mode */
+                        <g transform="translate(0, -5)">
+                            <path d="M35.5 5 H105.5 V15 H35.5 Z" fill="#222" stroke={isDark ? "#ccc" : "#333"} strokeWidth="2"/>
+                            <rect x="45.5" y="-35" width="50" height="40" fill="#333" stroke={isDark ? "#ccc" : "#333"} strokeWidth="2"/>
+                            <rect x="45.5" y="-5" width="50" height="10" fill="#FF4444" />
                         </g>
                     )}
+
+                    {/* Legs */}
+                    <g style={{ transformOrigin: "50px 130px", transform: isMoving ? "rotate(15deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
+                        <path d="M50 130 L50 155" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" />
+                        <path d="M38 155 Q50 165 62 155" fill={isDark ? "#666" : "#333"} />
+                    </g>
+                    <g style={{ transformOrigin: "91px 130px", transform: isMoving ? "rotate(-10deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
+                        <path d="M91 130 L91 155" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" />
+                        <path d="M79 155 Q91 165 103 155" fill={isDark ? "#666" : "#333"} />
+                    </g>
+
+                    {/* Jetpack Flame */}
+                    {isMoving && (
+                        <g style={{ animation: "flicker 0.1s infinite alternate", transform: "translate(70.5px, 145px)" }}>
+                            <path d="M-10 0 Q0 35 10 0" fill="#FF9900" opacity="0.8" />
+                            <path d="M-5 0 Q0 25 5 0" fill="#FFFF00" opacity="0.9" />
+                        </g>
+                    )}
+
                     {/* Arms */}
-                    <path d="M10 80 Q-10 100 10 120" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
-                    <path d="M138 80 Q158 100 138 120" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" style={{ transformOrigin: "138px 80px", animation: isHovered ? "wave 1s ease-in-out infinite" : "none" }} />
+                    <g style={{ transformOrigin: "10px 80px", transform: isMoving ? "rotate(10deg)" : "rotate(0deg)", transition: "transform 0.5s" }}>
+                        <path d="M10 80 C-15 95 -15 115 10 125" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
+                        <circle cx="10" cy="125" r="6" fill={isDark ? "#666" : "#333"} />
+                    </g>
+                    <g style={{ transformOrigin: "131px 80px", animation: isHovered ? "wave 1s ease-in-out infinite" : (isMoving ? "wave 2s ease-in-out infinite" : "none") }}>
+                        <path d="M131 80 C156 95 156 115 131 125" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
+                        <circle cx="131" cy="125" r="6" fill={isDark ? "#666" : "#333"} />
+                    </g>
+
                     <path id="circle" d="M70.5 140.5C109.16 140.5 140.5 109.16 140.5 70.5C140.5 31.8401 109.16 0.5 70.5 0.5C31.8401 0.5 0.5 31.8401 0.5 70.5C0.5 109.16 31.8401 140.5 70.5 140.5Z" fill="url(#bodyGradient)" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} />
-                    <path id="squre" d="M95.5 40.5H45.5C34.4543 40.5 25.5 49.4543 25.5 60.5V80.5C25.5 91.5457 34.4543 100.5 45.5 100.5H95.5C106.546 100.5 115.5 91.5457 115.5 80.5V60.5C115.5 49.4543 106.546 40.5 95.5 40.5Z" fill={isDark ? "#1A1A1A" : "#F0F0F0"} />
+                    
+                    {/* Chest Panel */}
+                    <rect x="50.5" y="115" width="40" height="12" rx="4" fill="#000" opacity="0.1" />
+                    <circle cx="60.5" cy="121" r="2.5" fill="#00F2FF">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="70.5" cy="121" r="2.5" fill="#FF4444">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="80.5" cy="121" r="2.5" fill="#00FF00">
+                        <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" />
+                    </circle>
+
+                    <path id="squre" d="M95.5 40.5H45.5C34.4543 40.5 25.5 49.4543 25.5 60.5V80.5C25.5 91.5457 34.4543 100.5 45.5 100.5H95.5C106.546 100.5 115.5 91.5457 115.5 80.5V60.5C115.5 49.4543 106.546 40.5 95.5 40.5Z" fill={isDark ? "#1A1A1A" : "#F0F0F0"} stroke={isDark ? "#555" : "#CCC"} strokeWidth="1" />
                 </g>
                 <Eyes expression={expression} isBlinking={isBlinking} eyeOffset={eyeOffset} />
                 <Mouth expression={expression} />
@@ -152,6 +193,8 @@ export default function RobotGuide({ isDark }) {
     const [isWiggling, setIsWiggling] = useState(false);
     const [isDancing, setIsDancing] = useState(false);
     const [isMoving, setIsMoving] = useState(false);
+    const [leanAngle, setLeanAngle] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
     const [footprints, setFootprints] = useState([]);
     const [hearts, setHearts] = useState([]);
     const lastPetPosition = useRef({ x: 0, y: 0 });
@@ -177,59 +220,115 @@ export default function RobotGuide({ isDark }) {
     const [isGameActive, setIsGameActive] = useState(false);
     const [gameScore, setGameScore] = useState(0);
     const [fallingItems, setFallingItems] = useState([]);
+    const fallingItemsRef = useRef([]);
     const gameLoopRef = useRef(null);
     const [showSettings, setShowSettings] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
     const [isTerminalDown, setIsTerminalDown] = useState(true);
+    const [isIntroMode, setIsIntroMode] = useState(false);
+    const isIntroModeRef = useRef(false);
 
-    const speak = (text) => {
-        if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
+    const speakAsync = (text) => {
+        return new Promise((resolve) => {
+            if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
 
-        setDisplayedText("");
-        setIsSpeaking(true);
-        isSpeakingRef.current = true;
-        setSpokenText(text);
+            setDisplayedText("");
+            setIsSpeaking(true);
+            isSpeakingRef.current = true;
+            setSpokenText(text);
 
-        if (typeof window !== "undefined" && window.speechSynthesis) {
-            window.speechSynthesis.cancel(); // Stop previous speech
+            if (typeof window !== "undefined" && window.speechSynthesis) {
+                window.speechSynthesis.cancel(); // Stop previous speech
 
-            if (isSoundEnabled) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                currentUtteranceRef.current = utterance;
+                if (isSoundEnabled) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    currentUtteranceRef.current = utterance;
 
-                // Select a more human-sounding voice if available
-                const preferredVoice = voices.find(voice =>
-                    (voice.name.includes("Google") && voice.lang.includes("en")) ||
-                    (voice.name.includes("Natural") && voice.lang.includes("en"))
-                );
-                if (preferredVoice) utterance.voice = preferredVoice;
+                    // Select a more human-sounding voice if available
+                    const preferredVoice = voices.find(voice =>
+                        (voice.name.includes("Google") && voice.lang.includes("en")) ||
+                        (voice.name.includes("Natural") && voice.lang.includes("en"))
+                    );
+                    if (preferredVoice) utterance.voice = preferredVoice;
 
-                utterance.rate = 1.0; // Natural speed
-                utterance.pitch = 1.0; // Natural pitch
-                utterance.onstart = () => {
-                    setIsSpeaking(true);
-                    isSpeakingRef.current = true;
-                };
-                utterance.onend = () => {
-                    if (currentUtteranceRef.current === utterance) {
+                    utterance.rate = 1.0; // Natural speed
+                    utterance.pitch = 1.0; // Natural pitch
+                    utterance.onstart = () => {
+                        setIsSpeaking(true);
+                        isSpeakingRef.current = true;
+                    };
+                    const handleEnd = () => {
+                        if (currentUtteranceRef.current === utterance) {
+                            setIsSpeaking(false);
+                            isSpeakingRef.current = false;
+                            setExpression("happy");
+                            setSpokenText("");
+                            resolve();
+                        }
+                    };
+                    utterance.onend = handleEnd;
+                    utterance.onerror = handleEnd;
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    // Fallback for text-only mode
+                    const duration = Math.max(2000, text.split(" ").length * 300);
+                    speechTimeoutRef.current = setTimeout(() => {
                         setIsSpeaking(false);
                         isSpeakingRef.current = false;
                         setExpression("happy");
                         setSpokenText("");
-                    }
-                };
-                window.speechSynthesis.speak(utterance);
+                        resolve();
+                    }, duration);
+                }
             } else {
-                // Fallback for text-only mode
-                const duration = Math.max(2000, text.split(" ").length * 300);
-                speechTimeoutRef.current = setTimeout(() => {
-                    setIsSpeaking(false);
-                    isSpeakingRef.current = false;
-                    setExpression("happy");
-                    setSpokenText("");
-                }, duration);
+                resolve();
+            }
+        });
+    };
+
+    const speak = (text) => {
+        if (isIntroModeRef.current) return;
+        speakAsync(text);
+    };
+
+    const startIntro = async () => {
+        if (isIntroModeRef.current) return;
+        setIsIntroMode(true);
+        isIntroModeRef.current = true;
+        setShowSettings(false);
+
+        await speakAsync("Welcome to the guided tour! I'll show you around Vimal's portfolio.");
+
+        for (const sectionId of SECTION_CONTAINER_IDS) {
+            if (!isIntroModeRef.current) break;
+
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: "smooth", block: "center" });
+                
+                // Wait for scroll
+                await new Promise(r => setTimeout(r, 1500));
+                
+                if (!isIntroModeRef.current) break;
+
+                const narrateText = section.getAttribute("data-narrate") || `This is the ${sectionId} section.`;
+                setExpression("excited");
+                await speakAsync(narrateText);
+                
+                await new Promise(r => setTimeout(r, 800));
             }
         }
+
+        if (isIntroModeRef.current) {
+            await speakAsync("That concludes the tour. Feel free to explore more!");
+            stopIntro();
+        }
+    };
+
+    const stopIntro = () => {
+        setIsIntroMode(false);
+        isIntroModeRef.current = false;
+        stopSpeaking();
     };
 
     useEffect(() => {
@@ -358,11 +457,29 @@ export default function RobotGuide({ isDark }) {
                     sectionEl.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.3)";
                 }
 
+                // Responsive positioning logic
                 const rect = sectionEl.getBoundingClientRect();
+                const viewportWidth = window.innerWidth;
+                let targetLeft = rect.right + window.scrollX - 100;
+
+                // Prevent robot from going off-screen or covering text on small screens
+                if (targetLeft + 120 > viewportWidth + window.scrollX) {
+                    targetLeft = rect.left + window.scrollX - 120;
+                    if (targetLeft < window.scrollX) {
+                        targetLeft = window.scrollX + viewportWidth - 120;
+                    }
+                }
+
+                // Calculate lean direction
+                const currentLeft = parseFloat(robotPosition.left) || (rect.right + window.scrollX - 100);
+                if (targetLeft > currentLeft + 50) setLeanAngle(15);
+                else if (targetLeft < currentLeft - 50) setLeanAngle(-15);
+                setTimeout(() => setLeanAngle(0), 1000);
+
                 setRobotPosition({
                     position: "absolute",
                     top: `${rect.top + window.scrollY - 75}px`,
-                    left: `${rect.right + window.scrollX - 100}px`,
+                    left: `${targetLeft}px`,
                     transition: "all 1s ease-in-out"
                 });
 
@@ -450,7 +567,7 @@ export default function RobotGuide({ isDark }) {
                 const dy = e.clientY - centerY;
                 const angle = Math.atan2(dy, dx);
                 // Limit movement radius to 6px
-                const distance = Math.min(6, Math.hypot(dx, dy) / 15);
+                const distance = Math.min(12, Math.hypot(dx, dy) / 15);
                 setEyeOffset({ x: Math.cos(angle) * distance, y: Math.sin(angle) * distance });
             }
 
@@ -520,6 +637,7 @@ export default function RobotGuide({ isDark }) {
         setIsGameActive(true);
         setGameScore(0);
         setFallingItems([]);
+        fallingItemsRef.current = [];
         speak("Catch the falling energy bolts to charge me up! Use arrow keys or drag me.");
         setExpression("excited");
     };
@@ -527,6 +645,7 @@ export default function RobotGuide({ isDark }) {
     const stopGame = () => {
         setIsGameActive(false);
         setFallingItems([]);
+        fallingItemsRef.current = [];
         if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current);
         speak(`Good game! You collected ${gameScore} energy bolts.`);
         setExpression("happy");
@@ -542,41 +661,49 @@ export default function RobotGuide({ isDark }) {
             if (!lastSpawnTime) lastSpawnTime = timestamp;
 
             if (timestamp - lastSpawnTime > 1000) {
-                setFallingItems(prev => [
-                    ...prev,
-                    { id: Date.now(), x: Math.random() * (window.innerWidth - 50) + 25, y: -50 }
-                ]);
+                fallingItemsRef.current.push({
+                    id: Date.now(),
+                    x: Math.random() * (window.innerWidth - 50) + 25,
+                    y: -50
+                });
                 lastSpawnTime = timestamp;
             }
 
-            setFallingItems(prev => {
-                const robotRect = containerRef.current?.getBoundingClientRect();
-                const nextItems = [];
+            const robotRect = containerRef.current?.getBoundingClientRect();
+            const nextItems = [];
+            let scoreIncrement = 0;
+
+            fallingItemsRef.current.forEach(item => {
+                const nextY = item.y + speed;
                 let caught = false;
 
-                prev.forEach(item => {
-                    const nextY = item.y + speed;
-                    if (robotRect) {
-                        const dist = Math.hypot(
-                            (robotRect.left + robotRect.width / 2) - (item.x + 15),
-                            (robotRect.top + robotRect.height / 2) - (nextY + 15)
-                        );
-                        if (dist < 60) {
-                            caught = true;
-                            return;
-                        }
+                if (robotRect) {
+                    const dist = Math.hypot(
+                        (robotRect.left + robotRect.width / 2) - (item.x + 15),
+                        (robotRect.top + robotRect.height / 2) - (nextY + 15)
+                    );
+                    if (dist < 60) {
+                        caught = true;
                     }
-                    if (nextY < window.innerHeight) nextItems.push({ ...item, y: nextY });
-                });
+                }
 
                 if (caught) {
-                    setGameScore(s => s + 1);
-                    setExpression("love");
-                    if (confusedTimeoutRef.current) clearTimeout(confusedTimeoutRef.current);
-                    confusedTimeoutRef.current = setTimeout(() => setExpression("happy"), 500);
+                    scoreIncrement++;
+                } else if (nextY < window.innerHeight) {
+                    nextItems.push({ ...item, y: nextY });
                 }
-                return nextItems;
             });
+
+            fallingItemsRef.current = nextItems;
+            setFallingItems([...nextItems]);
+
+            if (scoreIncrement > 0) {
+                setGameScore(s => s + scoreIncrement);
+                setExpression("love");
+                if (confusedTimeoutRef.current) clearTimeout(confusedTimeoutRef.current);
+                confusedTimeoutRef.current = setTimeout(() => setExpression("happy"), 500);
+            }
+
             gameLoopRef.current = requestAnimationFrame(loop);
         };
         gameLoopRef.current = requestAnimationFrame(loop);
@@ -638,6 +765,7 @@ export default function RobotGuide({ isDark }) {
             if (!hasMoved && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
                 hasMoved = true;
                 isDraggingRef.current = true;
+                setIsDragging(true);
             }
 
             if (hasMoved) {
@@ -657,7 +785,10 @@ export default function RobotGuide({ isDark }) {
             window.removeEventListener("mouseup", handleMouseUp);
             if (hasMoved) {
                 setRobotPosition(prev => ({ ...prev, transition: "all 1s ease-in-out" }));
-                setTimeout(() => { isDraggingRef.current = false; }, 0);
+                setTimeout(() => { 
+                    isDraggingRef.current = false;
+                    setIsDragging(false);
+                }, 0);
             }
         };
 
@@ -699,6 +830,7 @@ export default function RobotGuide({ isDark }) {
     };
 
     const handleRobotMouseMove = (e) => {
+        if (isDraggingRef.current) return;
         const now = Date.now();
         const dist = Math.hypot(e.clientX - lastPetPosition.current.x, e.clientY - lastPetPosition.current.y);
         lastPetPosition.current = { x: e.clientX, y: e.clientY };
@@ -776,12 +908,26 @@ export default function RobotGuide({ isDark }) {
                         </button>
                     </div>
 
+                    <div className={styles.settingItem}>
+                        <span>Guided Tour</span>
+                        <button 
+                            className={styles.settingBtn}
+                            onClick={isIntroMode ? stopIntro : startIntro}
+                            style={{ color: isIntroMode ? "#FF4444" : "#00F2FF", fontWeight: "bold" }}
+                        >
+                            {isIntroMode ? "STOP" : "START"}
+                        </button>
+                    </div>
+
                     {isSpeaking && (
                         <button
-                            onClick={stopSpeaking}
+                            onClick={() => {
+                                if (isIntroMode) stopIntro();
+                                else stopSpeaking();
+                            }}
                             className={styles.stopSpeakingBtn}
                         >
-                            Stop Speaking
+                            {isIntroMode ? "Stop Tour" : "Stop Speaking"}
                         </button>
                     )}
                 </div>
@@ -794,13 +940,33 @@ export default function RobotGuide({ isDark }) {
             ))}
             {isGameActive && (
                 <>
-                    <div className={styles.gameScore}>
-                        Score: {gameScore}
+                    <div style={{
+                        position: "fixed",
+                        top: "80px",
+                        right: "20px",
+                        background: "rgba(0, 0, 0, 0.85)",
+                        color: "#00F2FF",
+                        padding: "15px 25px",
+                        borderRadius: "15px",
+                        zIndex: 2001,
+                        border: "1px solid rgba(0, 242, 255, 0.3)",
+                        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+                        backdropFilter: "blur(8px)",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        minWidth: "120px"
+                    }}>
+                        <span style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "5px", color: "#ccc" }}>Score</span>
+                        <span style={{ fontSize: "32px", fontWeight: "bold", textShadow: "0 0 10px rgba(0, 242, 255, 0.5)" }}>{gameScore}</span>
+                        <span style={{ fontSize: "12px", marginTop: "5px", opacity: 0.7 }}>⚡ Energy</span>
                     </div>
                     {fallingItems.map(item => (
                         <div key={item.id} className={styles.fallingItem} style={{
                             left: item.x,
-                            top: item.y
+                            top: item.y,
+                            position: "fixed",
+                            zIndex: 2000
                         }}>⚡</div>
                     ))}
                 </>
@@ -808,7 +974,10 @@ export default function RobotGuide({ isDark }) {
             {hearts.map(h => (
                 <div key={h.id} className={styles.heart} style={{
                     left: h.x,
-                    top: h.y
+                    top: h.y,
+                    position: "fixed",
+                    pointerEvents: "none",
+                    zIndex: 2000
                 }}>❤️</div>
             ))}
             {isVisible && (
@@ -819,7 +988,10 @@ export default function RobotGuide({ isDark }) {
                         top: isTerminalDown ? "100%" : "auto",
                         marginBottom: isTerminalDown ? "0" : "15px",
                         marginTop: isTerminalDown ? "15px" : "0"
-                    }}>
+                    }}
+                    onClick={() => setSpokenText("")}
+                    title="Click to dismiss"
+                    >
                         <div className={styles.terminalHeader}>
                             <span>ROBOT_TERM.EXE</span>
                             <span>X</span>
@@ -845,6 +1017,9 @@ export default function RobotGuide({ isDark }) {
                     isWiggling={isWiggling}
                     isDancing={isDancing}
                     isMoving={isMoving}
+                    leanAngle={leanAngle}
+                    isDragging={isDragging}
+                    isIntroMode={isIntroMode}
                     role="button"
                     aria-label="Interactive Robot Guide"
                     tabIndex="0"
