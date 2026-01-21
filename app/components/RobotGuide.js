@@ -91,10 +91,12 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
             {...props}
             className={styles.robotSvg}
             style={{
-                transform: isSpinning ? "rotate(360deg)" : `rotate(${leanAngle}deg)`,
+                transform: isSpinning ? "rotate(360deg)" : `rotate(${leanAngle}deg) translateY(${isMoving ? '-10px' : '0px'})`,
                 transformOrigin: "center",
                 cursor: isDragging ? "grabbing" : "grab",
-                animation: isDancing ? "dance 0.6s ease-in-out infinite" : (isMoving ? "fly 1s ease-in-out infinite" : "fly 3s ease-in-out infinite")
+                transition: "transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                animation: isDancing ? "dance 0.6s ease-in-out infinite" : "none",
+                filter: "drop-shadow(0px 10px 10px rgba(0,0,0,0.2))"
             }}
         >
             <defs>
@@ -102,76 +104,96 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
                     <stop stopColor={isDark ? "#FFFFFF" : "#4A4A4A"} />
                     <stop offset="1" stopColor={isDark ? "#E0E0E0" : "#2A2A2A"} />
                 </linearGradient>
+                <radialGradient id="shadowGradient" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="rgba(0,0,0,0.4)" />
+                    <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+                </radialGradient>
+                <linearGradient id="screenGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={isDark ? "#222" : "#eee"} />
+                    <stop offset="50%" stopColor={isDark ? "#333" : "#fff"} />
+                    <stop offset="100%" stopColor={isDark ? "#222" : "#eee"} />
+                </linearGradient>
             </defs>
+
+            {/* Dynamic Shadow */}
+            <ellipse cx="70.5" cy="170" rx={isMoving ? "20" : "35"} ry={isMoving ? "5" : "8"} fill="url(#shadowGradient)" style={{ transition: "all 0.3s ease" }}>
+                <animate attributeName="rx" values="35;30;35" dur="3s" repeatCount="indefinite" begin="0s" />
+                <animate attributeName="opacity" values="0.6;0.3;0.6" dur="3s" repeatCount="indefinite" begin="0s" />
+            </ellipse>
+
             <g style={{ animation: isDancing ? "rainbow 2s linear infinite" : "none" }}>
-                <g id="robot">
-                    {/* Ears / Headphones */}
-                    <rect x="-5" y="60" width="12" height="24" rx="4" fill={isDark ? "#888" : "#333"} />
-                    <rect x="134" y="60" width="12" height="24" rx="4" fill={isDark ? "#888" : "#333"} />
+                <g style={{ animation: isMoving ? "none" : "float 3s ease-in-out infinite" }}>
+                    <animateTransform attributeName="transform" type="translate" values="0,0; 0,-10; 0,0" dur="3s" repeatCount="indefinite" additive="sum" />
 
-                    {/* Antenna */}
-                    {!isIntroMode ? (
-                        <g style={{ transformOrigin: "70.5px 0px", animation: isWiggling ? "wiggle 0.5s ease-in-out infinite" : "none" }}>
-                            <line x1="70.5" y1="0" x2="70.5" y2="-25" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="4" strokeLinecap="round" />
-                            <circle cx="70.5" cy="-25" r="6" fill="#FF4444">
-                                <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite" />
-                            </circle>
+                    <g id="robot">
+                        {/* Ears / Headphones */}
+                        <rect x="-5" y="60" width="12" height="24" rx="4" fill={isDark ? "#888" : "#333"} />
+                        <rect x="134" y="60" width="12" height="24" rx="4" fill={isDark ? "#888" : "#333"} />
+
+                        {/* Antenna */}
+                        {!isIntroMode ? (
+                            <g style={{ transformOrigin: "70.5px 0px", animation: isWiggling ? "wiggle 0.5s ease-in-out infinite" : "none" }}>
+                                <line x1="70.5" y1="0" x2="70.5" y2="-25" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="4" strokeLinecap="round" />
+                                <circle cx="70.5" cy="-25" r="6" fill="#FF4444">
+                                    <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite" />
+                                </circle>
+                            </g>
+                        ) : (
+                            /* Top Hat for Intro Mode */
+                            <g transform="translate(0, -5)">
+                                <path d="M35.5 5 H105.5 V15 H35.5 Z" fill="#222" stroke={isDark ? "#ccc" : "#333"} strokeWidth="2" />
+                                <rect x="45.5" y="-35" width="50" height="40" fill="#333" stroke={isDark ? "#ccc" : "#333"} strokeWidth="2" />
+                                <rect x="45.5" y="-5" width="50" height="10" fill="#FF4444" />
+                            </g>
+                        )}
+
+                        {/* Legs */}
+                        <g style={{ transformOrigin: "50px 130px", transform: isMoving ? "rotate(15deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
+                            <path d="M50 130 L50 155" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" />
+                            <path d="M38 155 Q50 165 62 155" fill={isDark ? "#666" : "#333"} />
                         </g>
-                    ) : (
-                        /* Top Hat for Intro Mode */
-                        <g transform="translate(0, -5)">
-                            <path d="M35.5 5 H105.5 V15 H35.5 Z" fill="#222" stroke={isDark ? "#ccc" : "#333"} strokeWidth="2"/>
-                            <rect x="45.5" y="-35" width="50" height="40" fill="#333" stroke={isDark ? "#ccc" : "#333"} strokeWidth="2"/>
-                            <rect x="45.5" y="-5" width="50" height="10" fill="#FF4444" />
+                        <g style={{ transformOrigin: "91px 130px", transform: isMoving ? "rotate(-10deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
+                            <path d="M91 130 L91 155" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" />
+                            <path d="M79 155 Q91 165 103 155" fill={isDark ? "#666" : "#333"} />
                         </g>
-                    )}
 
-                    {/* Legs */}
-                    <g style={{ transformOrigin: "50px 130px", transform: isMoving ? "rotate(15deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
-                        <path d="M50 130 L50 155" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" />
-                        <path d="M38 155 Q50 165 62 155" fill={isDark ? "#666" : "#333"} />
-                    </g>
-                    <g style={{ transformOrigin: "91px 130px", transform: isMoving ? "rotate(-10deg)" : "rotate(0deg)", transition: "transform 0.3s" }}>
-                        <path d="M91 130 L91 155" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" />
-                        <path d="M79 155 Q91 165 103 155" fill={isDark ? "#666" : "#333"} />
-                    </g>
+                        {/* Jetpack Flame */}
+                        {isMoving && (
+                            <g style={{ transform: "translate(70.5px, 145px)" }}>
+                                <path d="M-10 0 Q0 35 10 0" fill="#FF9900" opacity="0.8"><animate attributeName="d" values="M-10 0 Q0 35 10 0; M-8 0 Q0 45 8 0; M-10 0 Q0 35 10 0" dur="0.2s" repeatCount="indefinite" /></path>
+                                <path d="M-5 0 Q0 25 5 0" fill="#FFFF00" opacity="0.9"><animate attributeName="d" values="M-5 0 Q0 25 5 0; M-4 0 Q0 35 4 0; M-5 0 Q0 25 5 0" dur="0.2s" repeatCount="indefinite" /></path>
+                            </g>
+                        )}
 
-                    {/* Jetpack Flame */}
-                    {isMoving && (
-                        <g style={{ animation: "flicker 0.1s infinite alternate", transform: "translate(70.5px, 145px)" }}>
-                            <path d="M-10 0 Q0 35 10 0" fill="#FF9900" opacity="0.8" />
-                            <path d="M-5 0 Q0 25 5 0" fill="#FFFF00" opacity="0.9" />
+                        {/* Arms */}
+                        <g style={{ transformOrigin: "10px 80px", transform: isMoving ? "rotate(10deg)" : "rotate(0deg)", transition: "transform 0.5s" }}>
+                            <path d="M10 80 C-15 95 -15 115 10 125" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
+                            <circle cx="10" cy="125" r="6" fill={isDark ? "#666" : "#333"} />
                         </g>
-                    )}
+                        <g style={{ transformOrigin: "131px 80px", animation: isHovered ? "wave 1s ease-in-out infinite" : (isMoving ? "wave 2s ease-in-out infinite" : "none") }}>
+                            <path d="M131 80 C156 95 156 115 131 125" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
+                            <circle cx="131" cy="125" r="6" fill={isDark ? "#666" : "#333"} />
+                        </g>
 
-                    {/* Arms */}
-                    <g style={{ transformOrigin: "10px 80px", transform: isMoving ? "rotate(10deg)" : "rotate(0deg)", transition: "transform 0.5s" }}>
-                        <path d="M10 80 C-15 95 -15 115 10 125" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
-                        <circle cx="10" cy="125" r="6" fill={isDark ? "#666" : "#333"} />
+                        <path id="circle" d="M70.5 140.5C109.16 140.5 140.5 109.16 140.5 70.5C140.5 31.8401 109.16 0.5 70.5 0.5C31.8401 0.5 0.5 31.8401 0.5 70.5C0.5 109.16 31.8401 140.5 70.5 140.5Z" fill="url(#bodyGradient)" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} />
+
+                        {/* Chest Panel */}
+                        <rect x="50.5" y="115" width="40" height="12" rx="4" fill="#000" opacity="0.1" />
+                        <circle cx="60.5" cy="121" r="2.5" fill="#00F2FF">
+                            <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="70.5" cy="121" r="2.5" fill="#FF4444">
+                            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" />
+                        </circle>
+                        <circle cx="80.5" cy="121" r="2.5" fill="#00FF00">
+                            <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" />
+                        </circle>
+
+                        <path id="squre" d="M95.5 40.5H45.5C34.4543 40.5 25.5 49.4543 25.5 60.5V80.5C25.5 91.5457 34.4543 100.5 45.5 100.5H95.5C106.546 100.5 115.5 91.5457 115.5 80.5V60.5C115.5 49.4543 106.546 40.5 95.5 40.5Z" fill="url(#screenGradient)" stroke={isDark ? "#555" : "#CCC"} strokeWidth="1" />
                     </g>
-                    <g style={{ transformOrigin: "131px 80px", animation: isHovered ? "wave 1s ease-in-out infinite" : (isMoving ? "wave 2s ease-in-out infinite" : "none") }}>
-                        <path d="M131 80 C156 95 156 115 131 125" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
-                        <circle cx="131" cy="125" r="6" fill={isDark ? "#666" : "#333"} />
-                    </g>
-
-                    <path id="circle" d="M70.5 140.5C109.16 140.5 140.5 109.16 140.5 70.5C140.5 31.8401 109.16 0.5 70.5 0.5C31.8401 0.5 0.5 31.8401 0.5 70.5C0.5 109.16 31.8401 140.5 70.5 140.5Z" fill="url(#bodyGradient)" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} />
-                    
-                    {/* Chest Panel */}
-                    <rect x="50.5" y="115" width="40" height="12" rx="4" fill="#000" opacity="0.1" />
-                    <circle cx="60.5" cy="121" r="2.5" fill="#00F2FF">
-                        <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="70.5" cy="121" r="2.5" fill="#FF4444">
-                        <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" />
-                    </circle>
-                    <circle cx="80.5" cy="121" r="2.5" fill="#00FF00">
-                        <animate attributeName="opacity" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" />
-                    </circle>
-
-                    <path id="squre" d="M95.5 40.5H45.5C34.4543 40.5 25.5 49.4543 25.5 60.5V80.5C25.5 91.5457 34.4543 100.5 45.5 100.5H95.5C106.546 100.5 115.5 91.5457 115.5 80.5V60.5C115.5 49.4543 106.546 40.5 95.5 40.5Z" fill={isDark ? "#1A1A1A" : "#F0F0F0"} stroke={isDark ? "#555" : "#CCC"} strokeWidth="1" />
+                    <Eyes expression={expression} isBlinking={isBlinking} eyeOffset={eyeOffset} />
+                    <Mouth expression={expression} />
                 </g>
-                <Eyes expression={expression} isBlinking={isBlinking} eyeOffset={eyeOffset} />
-                <Mouth expression={expression} />
             </g>
         </svg>
     );
@@ -227,6 +249,16 @@ export default function RobotGuide({ isDark }) {
     const [isTerminalDown, setIsTerminalDown] = useState(true);
     const [isIntroMode, setIsIntroMode] = useState(false);
     const isIntroModeRef = useRef(false);
+    const [robotSize, setRobotSize] = useState(100);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setRobotSize(window.innerWidth < 768 ? 60 : 100);
+        };
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     const speakAsync = (text) => {
         return new Promise((resolve) => {
@@ -305,16 +337,16 @@ export default function RobotGuide({ isDark }) {
             const section = document.getElementById(sectionId);
             if (section) {
                 section.scrollIntoView({ behavior: "smooth", block: "center" });
-                
+
                 // Wait for scroll
                 await new Promise(r => setTimeout(r, 1500));
-                
+
                 if (!isIntroModeRef.current) break;
 
                 const narrateText = section.getAttribute("data-narrate") || `This is the ${sectionId} section.`;
                 setExpression("excited");
                 await speakAsync(narrateText);
-                
+
                 await new Promise(r => setTimeout(r, 800));
             }
         }
@@ -451,7 +483,7 @@ export default function RobotGuide({ isDark }) {
                 }
                 currentSectionRef.current = sectionId;
                 highlightedElementRef.current = sectionEl;
-                
+
                 if (!SECTION_CONTAINER_IDS.includes(sectionEl.id)) {
                     sectionEl.style.outline = "2px solid #00F2FF";
                     sectionEl.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.3)";
@@ -480,7 +512,7 @@ export default function RobotGuide({ isDark }) {
                     position: "absolute",
                     top: `${rect.top + window.scrollY - 75}px`,
                     left: `${targetLeft}px`,
-                    transition: "all 1s ease-in-out"
+                    transition: "all 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)"
                 });
 
                 if (moveTimeoutRef.current) clearTimeout(moveTimeoutRef.current);
@@ -569,6 +601,11 @@ export default function RobotGuide({ isDark }) {
                 // Limit movement radius to 6px
                 const distance = Math.min(12, Math.hypot(dx, dy) / 15);
                 setEyeOffset({ x: Math.cos(angle) * distance, y: Math.sin(angle) * distance });
+
+                if (!isMoving) {
+                    const tilt = Math.max(-10, Math.min(10, dx / 20));
+                    setLeanAngle(tilt);
+                }
             }
 
             idleTimeoutRef.current = setTimeout(() => {
@@ -785,7 +822,7 @@ export default function RobotGuide({ isDark }) {
             window.removeEventListener("mouseup", handleMouseUp);
             if (hasMoved) {
                 setRobotPosition(prev => ({ ...prev, transition: "all 1s ease-in-out" }));
-                setTimeout(() => { 
+                setTimeout(() => {
                     isDraggingRef.current = false;
                     setIsDragging(false);
                 }, 0);
@@ -840,7 +877,7 @@ export default function RobotGuide({ isDark }) {
             if (petScore.current > 30) {
                 setExpression("love");
                 if (Math.random() > 0.7) setHearts(prev => [...prev, { id: Date.now() + Math.random(), x: e.clientX - 10, y: e.clientY - 20 }]);
-                
+
                 if (confusedTimeoutRef.current) clearTimeout(confusedTimeoutRef.current);
                 confusedTimeoutRef.current = setTimeout(() => {
                     setExpression("happy");
@@ -871,10 +908,10 @@ export default function RobotGuide({ isDark }) {
             {showSettings && (
                 <div className={styles.settingsPanel}>
                     <div style={{ fontSize: "12px", textTransform: "uppercase", letterSpacing: "1px", color: isDark ? "#888" : "#999", marginBottom: "5px" }}>Controls</div>
-                    
+
                     <div className={styles.settingItem}>
                         <span>Robot Visibility</span>
-                        <button 
+                        <button
                             className={styles.settingBtn}
                             onClick={() => setIsVisible(!isVisible)}
                             style={{ color: isVisible ? "#00F2FF" : "#FF4444", fontWeight: "bold" }}
@@ -885,7 +922,7 @@ export default function RobotGuide({ isDark }) {
 
                     <div className={styles.settingItem}>
                         <span>Sound Effects</span>
-                        <button 
+                        <button
                             className={styles.settingBtn}
                             onClick={() => setIsSoundEnabled(!isSoundEnabled)}
                             style={{ color: isSoundEnabled ? "#00F2FF" : "#FF4444", fontWeight: "bold" }}
@@ -896,7 +933,7 @@ export default function RobotGuide({ isDark }) {
 
                     <div className={styles.settingItem}>
                         <span>Mini Game</span>
-                        <button 
+                        <button
                             className={styles.settingBtn}
                             onClick={() => {
                                 if (isGameActive) stopGame();
@@ -910,7 +947,7 @@ export default function RobotGuide({ isDark }) {
 
                     <div className={styles.settingItem}>
                         <span>Guided Tour</span>
-                        <button 
+                        <button
                             className={styles.settingBtn}
                             onClick={isIntroMode ? stopIntro : startIntro}
                             style={{ color: isIntroMode ? "#FF4444" : "#00F2FF", fontWeight: "bold" }}
@@ -981,56 +1018,75 @@ export default function RobotGuide({ isDark }) {
                 }}>❤️</div>
             ))}
             {isVisible && (
-            <div ref={containerRef} className={styles.robotContainer} style={robotPosition}>
-                {spokenText && (
-                    <div className={styles.terminal} style={{
-                        bottom: isTerminalDown ? "auto" : "100%",
-                        top: isTerminalDown ? "100%" : "auto",
-                        marginBottom: isTerminalDown ? "0" : "15px",
-                        marginTop: isTerminalDown ? "15px" : "0"
-                    }}
-                    onClick={() => setSpokenText("")}
-                    title="Click to dismiss"
-                    >
-                        <div className={styles.terminalHeader}>
-                            <span>ROBOT_TERM.EXE</span>
-                            <span>X</span>
-                        </div>
-                        <div className={styles.terminalBody}>
-                            <span style={{ marginRight: "5px" }}>&gt;</span>
+                <div ref={containerRef} className={styles.robotContainer} style={robotPosition}>
+                    {spokenText && (
+                        <div className={styles.terminal} style={{
+                            position: "absolute",
+                            left: "50%",
+                            transform: "translateX(-50%)",
+                            bottom: isTerminalDown ? "auto" : "100%",
+                            top: isTerminalDown ? "100%" : "auto",
+                            marginBottom: isTerminalDown ? "0" : "25px",
+                            marginTop: isTerminalDown ? "25px" : "0",
+                            fontSize: robotSize === 60 ? "12px" : "14px",
+                            width: robotSize === 60 ? "160px" : "220px",
+                            overflow: "visible",
+                            backgroundColor: isDark ? "rgba(30, 30, 30, 0.95)" : "rgba(255, 255, 255, 0.95)",
+                            color: isDark ? "#fff" : "#333",
+                            borderRadius: "25px",
+                            border: `1px solid ${isDark ? "#555" : "#ccc"}`,
+                            padding: "15px",
+                            boxShadow: "0 5px 15px rgba(0,0,0,0.2)",
+                            fontFamily: "sans-serif",
+                            textAlign: "center",
+                            zIndex: 1000
+                        }}
+                            onClick={() => setSpokenText("")}
+                            title="Click to dismiss"
+                        >
                             {displayedText}
-                            <span className={styles.terminalCursor}>_</span>
+                            <svg width="30" height="15" viewBox="0 0 30 15" style={{
+                                position: "absolute",
+                                left: "50%",
+                                transform: `translateX(-50%) ${isTerminalDown ? "rotate(180deg)" : ""}`,
+                                [isTerminalDown ? "top" : "bottom"]: "-14px",
+                                overflow: "visible"
+                            }}>
+                                <path d="M0 0 Q15 25 30 0" fill={isDark ? "rgba(30, 30, 30, 0.95)" : "rgba(255, 255, 255, 0.95)"} stroke={isDark ? "#555" : "#ccc"} strokeWidth="1" />
+                                <path d="M2 0 L28 0" stroke="none" fill={isDark ? "rgba(30, 30, 30, 0.95)" : "rgba(255, 255, 255, 0.95)"} />
+                            </svg>
                         </div>
-                    </div>
-                )}
-                <RobotIcon
-                    expression={expression}
-                    isSpeaking={isSpeaking}
-                    isDark={isDark}
-                    onRobotClick={handleRobotClick}
-                    onRobotDoubleClick={handleRobotDoubleClick}
-                    onMouseDown={handleMouseDown}
-                    onMouseMove={handleRobotMouseMove}
-                    isSpinning={isSpinning}
-                    isBlinking={isBlinking}
-                    eyeOffset={eyeOffset}
-                    isWiggling={isWiggling}
-                    isDancing={isDancing}
-                    isMoving={isMoving}
-                    leanAngle={leanAngle}
-                    isDragging={isDragging}
-                    isIntroMode={isIntroMode}
-                    role="button"
-                    aria-label="Interactive Robot Guide"
-                    tabIndex="0"
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            handleRobotClick();
-                        }
-                    }}
-                />
-            </div>
+                    )}
+                    <RobotIcon
+                        expression={expression}
+                        isSpeaking={isSpeaking}
+                        isDark={isDark}
+                        onRobotClick={handleRobotClick}
+                        onRobotDoubleClick={handleRobotDoubleClick}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleRobotMouseMove}
+                        isSpinning={isSpinning}
+                        isBlinking={isBlinking}
+                        eyeOffset={eyeOffset}
+                        isWiggling={isWiggling}
+                        isDancing={isDancing}
+                        isMoving={isMoving}
+                        leanAngle={leanAngle}
+                        isDragging={isDragging}
+                        isIntroMode={isIntroMode}
+                        width={robotSize}
+                        height={robotSize}
+                        role="button"
+                        aria-label="Interactive Robot Guide"
+                        tabIndex="0"
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                handleRobotClick();
+                            }
+                        }}
+                    />
+                </div>
             )}
         </>
     );
