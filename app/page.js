@@ -25,18 +25,50 @@ import {
   ArrowUp,
   Github,
   Linkedin,
-  Twitter
+  Twitter,
+  Layout,
+  Database,
+  Cloud,
+  Brain
 } from "lucide-react";
 
-const SKILLS = [
-  "JavaScript",
-  "React",
-  "Next.js",
-  "Node.js",
-  "HTML5 & CSS3",
-  "Git & GitHub",
-  "NFC Technology",
-  "Web APIs",
+const SKILL_CATEGORIES = [
+  {
+    title: "Frontend Development",
+    icon: Layout,
+    items: [
+      "React",
+      "Next.js",
+      "JavaScript",
+      "HTML5 & CSS3",
+      "Tailwind CSS"
+    ]
+  },
+  {
+    title: "Backend & Tools",
+    icon: Database,
+    items: [
+      "Node.js",
+      "Express.js",
+      "MongoDB",
+      "Git & GitHub",
+      "REST APIs",
+      "NFC Technology",
+      "VS Code"
+    ]
+  },
+  {
+    title: "Cloud & AI",
+    icon: Cloud,
+    items: [
+      "AWS",
+      "GCP",
+      "Docker",
+      "CI/CD",
+      "Python",
+      "Machine Learning (Learning)"
+    ]
+  }
 ];
 
 const EXPERIENCE = [
@@ -149,7 +181,7 @@ const JSON_LD = {
   "alternateName": "VimalVerma",
   "url": "https://vimalverma.in",
   "jobTitle": "Software Developer",
-  "knowsAbout": SKILLS,
+  "knowsAbout": SKILL_CATEGORIES.flatMap(cat => cat.items),
   "description": "Software Developer and Web App Creator specializing in React, Next.js, and NFC technology."
 };
 
@@ -240,6 +272,7 @@ export default function Home() {
   const [loadingBlogs, setLoadingBlogs] = useState(true);
   const recommendationsRef = useRef(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -305,6 +338,36 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleScrollProgress = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(progress);
+    };
+    window.addEventListener("scroll", handleScrollProgress);
+    return () => window.removeEventListener("scroll", handleScrollProgress);
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(styles.scrollAnimationVisible);
+          } else {
+            entry.target.classList.remove(styles.scrollAnimationVisible);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const sections = document.querySelectorAll(`.${styles.scrollAnimation}`);
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -323,12 +386,17 @@ export default function Home() {
   return (
     <div className={`${styles.page} ${isDark ? styles.darkMode : ""}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
+      <div className={styles.progressBar} style={{ width: `${scrollProgress}%` }} />
       <RobotGuide isDark={isDark} />
       <Header isDark={isDark} toggleTheme={toggleTheme} />
       <main className={styles.main}>
         <section id="introduction" className={styles.hero} data-narrate="Welcome! I am Vimal's virtual assistant. Let me introduce you to Vimal, a passionate Software Developer and Web App Creator." data-section="Introduction">
-          <h1 className={`${styles.title} ${styles.animateFadeUp} ${styles.delay1}`} style={{ background: "linear-gradient(90deg, #00F2FF, #0078FF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}>
-            Vimal Kumar <span className={styles.handle} style={{ WebkitTextFillColor: isDark ? "#888" : "#666", fontSize: "0.6em" }}>(VimalVerma)</span>
+          <div className={`${styles.statusBadge} ${styles.animateFadeUp} ${styles.delay1}`}>
+            <span className={styles.statusDot}></span>
+            Available for new projects
+          </div>
+          <h1 className={`${styles.title} ${styles.animateFadeUp} ${styles.delay1}`}>
+            <span className={styles.gradientText}>Vimal Kumar</span> <span className={styles.handle}>(VimalVerma)</span>
           </h1>
           <p className={`${styles.subtitle} ${styles.animateFadeUp} ${styles.delay2}`}>
             Software Developer | Web App Creator
@@ -375,7 +443,7 @@ export default function Home() {
 
         <section className={styles.contentSection}>
 
-          <div id="about" className={styles.aboutSection} style={{ "--accent-color": "#6366F1" }} data-narrate="Learn more about Vimal's background and passion for technology." data-section="About">
+          <div id="about" className={`${styles.aboutSection} ${styles.scrollAnimation}`} style={{ "--accent-color": "#6366F1" }} data-narrate="Learn more about Vimal's background and passion for technology." data-section="About">
             <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}>
               <User size={28} /> About Me
             </h2>
@@ -404,7 +472,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div id="projects" className={styles.projectsSection} style={{ "--accent-color": "#00F2FF" }} data-narrate="Here are some of the exciting projects Vimal has built. Feel free to hover over them for details." data-section="Projects">
+          <div id="projects" className={`${styles.projectsSection} ${styles.scrollAnimation}`} style={{ "--accent-color": "#00F2FF" }} data-narrate="Here are some of the exciting projects Vimal has built. Feel free to hover over them for details." data-section="Projects">
             <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Globe size={28} /> My Projects</h2>
             <div className={styles.grid}>
               {PROJECTS.map((project) => (
@@ -413,19 +481,28 @@ export default function Home() {
             </div>
           </div>
 
-          <div id="skills" className={styles.skillsSection} style={{ "--accent-color": "#FF0080" }} data-narrate="Vimal has a diverse skill set, ranging from React and Next JS to NFC Technology." data-section="Skills">
+          <div id="skills" className={`${styles.skillsSection} ${styles.scrollAnimation}`} style={{ "--accent-color": "#FF0080" }} data-narrate="Vimal has a diverse skill set, ranging from React and Next JS to NFC Technology." data-section="Skills">
             <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Cpu size={28} /> Skills & Technologies</h2>
-            <div className={styles.skillsList}>
-              {SKILLS.map((skill) => (
-                <span key={skill} className={styles.skillBadge} data-narrate={`Skill: ${skill}`} data-section="Skills" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-                  <Code2 size={16} />
-                  {skill}
-                </span>
+            <div className={styles.skillCategoriesGrid}>
+              {SKILL_CATEGORIES.map((category, index) => (
+                <div key={index} className={styles.skillCategoryCard} data-narrate={`Skill Category: ${category.title}`} data-section="Skills">
+                  <div className={styles.skillCategoryHeader}>
+                    <category.icon size={24} style={{ color: "var(--accent-color)" }} />
+                    <h3 className={styles.skillCategoryTitle}>{category.title}</h3>
+                  </div>
+                  <div className={styles.skillList}>
+                    {category.items.map((skill) => (
+                      <span key={skill} className={styles.skillTag} data-narrate={`Skill: ${skill}`} data-section="Skills">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
 
-          <div id="experience" className={styles.experienceSection} style={{ "--accent-color": "#7928CA" }} data-narrate="Here is a timeline of Vimal's professional work experience and career growth." data-section="Experience">
+          <div id="experience" className={`${styles.experienceSection} ${styles.scrollAnimation}`} style={{ "--accent-color": "#7928CA" }} data-narrate="Here is a timeline of Vimal's professional work experience and career growth." data-section="Experience">
             <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Briefcase size={28} /> Work Experience</h2>
             <div className={styles.timeline}>
               {EXPERIENCE.map((job, index) => (
@@ -441,7 +518,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div id="education" className={styles.educationSection} style={{ "--accent-color": "#FF4D4D" }} data-narrate="Vimal's educational background." data-section="Education">
+          <div id="education" className={`${styles.educationSection} ${styles.scrollAnimation}`} style={{ "--accent-color": "#FF4D4D" }} data-narrate="Vimal's educational background." data-section="Education">
             <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><GraduationCap size={28} /> Education</h2>
             <div className={styles.timeline}>
               {EDUCATION.map((edu, index) => (
@@ -457,7 +534,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div id="certifications" className={styles.certificationSection} style={{ "--accent-color": "#F5A623" }} data-narrate="Certifications earned by Vimal." data-section="Certifications">
+          <div id="certifications" className={`${styles.certificationSection} ${styles.scrollAnimation}`} style={{ "--accent-color": "#F5A623" }} data-narrate="Certifications earned by Vimal." data-section="Certifications">
             <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Award size={28} /> Certifications</h2>
             <div className={styles.grid}>
               {CERTIFICATIONS.map((cert, index) => (
@@ -481,7 +558,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div id="blog" className={styles.blogSection} style={{ "--accent-color": "#10B981" }} data-narrate="Read my latest articles from Dev.to." data-section="Blog">
+          <div id="blog" className={`${styles.blogSection} ${styles.scrollAnimation}`} style={{ "--accent-color": "#10B981" }} data-narrate="Read my latest articles from Dev.to." data-section="Blog">
             <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><BookOpen size={28} /> Latest Articles</h2>
             <div className={styles.grid}>
               {loadingBlogs ? (
@@ -504,7 +581,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="recommendations" className={styles.recommendationsSection} style={{ "--accent-color": "#8B5CF6" }} data-narrate="Here is what people are saying about Vimal on LinkedIn." data-section="Recommendations">
+        <section id="recommendations" className={`${styles.recommendationsSection} ${styles.scrollAnimation}`} style={{ "--accent-color": "#8B5CF6" }} data-narrate="Here is what people are saying about Vimal on LinkedIn." data-section="Recommendations">
           <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><MessageSquare size={28} /> LinkedIn Recommendations</h2>
           <div className={styles.carouselContainer}>
             <button
@@ -552,7 +629,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="contact" className={styles.contactSection} style={{ "--accent-color": "#14B8A6" }} data-narrate="Ready to collaborate? Use this form to send a message directly to Vimal." data-section="Contact">
+        <section id="contact" className={`${styles.contactSection} ${styles.scrollAnimation}`} style={{ "--accent-color": "#14B8A6" }} data-narrate="Ready to collaborate? Use this form to send a message directly to Vimal." data-section="Contact">
           <h2 style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Mail size={28} /> Get In Touch</h2>
           <p style={{ marginBottom: "40px", opacity: 0.8, maxWidth: "600px", margin: "0 auto 40px" }}>
             Have a project in mind or just want to say hi? Fill out the form below and I&apos;ll get back to you as soon as possible.
