@@ -6,31 +6,31 @@ const strokeColor = "#333";
 const faceColor = "#fff";
 
 // Eyes
-const Eyes = ({ expression, isBlinking, eyeOffset = { x: 0, y: 0 } }) => {
+const Eyes = ({ expression, isBlinking, eyeOffset = { x: 0, y: 0 }, color = "#00F2FF" }) => {
     if (isBlinking) return (
         <g>
-            <path d="M42 72 Q50 76 58 72" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />
-            <path d="M82 72 Q90 76 98 72" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M42 72 Q50 76 58 72" stroke={color} strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M82 72 Q90 76 98 72" stroke={color} strokeWidth="3" strokeLinecap="round" fill="none" />
         </g>
     );
     if (expression === "excited") return (
         <g>
-            <path id="Vector" d="M50.5 55.5L53.5 63.5H62.5L55.5 69.5L58.5 77.5L50.5 72.5L42.5 77.5L45.5 69.5L38.5 63.5H47.5L50.5 55.5Z" fill="#00F2FF" />
-            <path id="Vector_2" d="M90.5 55.5L93.5 63.5H102.5L95.5 69.5L98.5 77.5L90.5 72.5L82.5 77.5L85.5 69.5L78.5 63.5H87.5L90.5 55.5Z" fill="#00F2FF" />
+            <path id="Vector" d="M50.5 55.5L53.5 63.5H62.5L55.5 69.5L58.5 77.5L50.5 72.5L42.5 77.5L45.5 69.5L38.5 63.5H47.5L50.5 55.5Z" fill={color} />
+            <path id="Vector_2" d="M90.5 55.5L93.5 63.5H102.5L95.5 69.5L98.5 77.5L90.5 72.5L82.5 77.5L85.5 69.5L78.5 63.5H87.5L90.5 55.5Z" fill={color} />
         </g>);
     if (expression === "happy") return (
         <g>
-            <path id="Vector_4" d="M50.5 60.5C45.5 50.5 35.5 60.5 40.5 70.5L50.5 80.5L60.5 70.5C65.5 60.5 55.5 50.5 50.5 60.5Z" fill="#00F2FF" />
-            <path id="Vector_5" d="M90.5 60.5C85.5 50.5 75.5 60.5 80.5 70.5L90.5 80.5L100.5 70.5C105.5 60.5 95.5 50.5 90.5 60.5Z" fill="#00F2FF" />
+            <path id="Vector_4" d="M50.5 60.5C45.5 50.5 35.5 60.5 40.5 70.5L50.5 80.5L60.5 70.5C65.5 60.5 55.5 50.5 50.5 60.5Z" fill={color} />
+            <path id="Vector_5" d="M90.5 60.5C85.5 50.5 75.5 60.5 80.5 70.5L90.5 80.5L100.5 70.5C105.5 60.5 95.5 50.5 90.5 60.5Z" fill={color} />
         </g>);
     if (expression === "sleepy") return (<g>
-        <path id="Vector_10" d="M40.5 70.5C47.1667 63.8333 53.8333 63.8333 60.5 70.5" stroke="#00F2FF" strokeWidth="4" strokeLinecap="round" />
-        <path id="Vector_11" d="M80.5 70.5C87.1667 63.8333 93.8333 63.8333 100.5 70.5" stroke="#00F2FF" strokeWidth="4" strokeLinecap="round" />
+        <path id="Vector_10" d="M40.5 70.5C47.1667 63.8333 53.8333 63.8333 60.5 70.5" stroke={color} strokeWidth="4" strokeLinecap="round" />
+        <path id="Vector_11" d="M80.5 70.5C87.1667 63.8333 93.8333 63.8333 100.5 70.5" stroke={color} strokeWidth="4" strokeLinecap="round" />
     </g>);
     if (expression === "confused") return (
         <g style={{ transform: `translate(${eyeOffset.x}px, ${eyeOffset.y}px)` }}>
-            <path d="M42 68 Q50 60 58 68" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />
-            <path d="M82 72 Q90 76 98 72" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M42 68 Q50 60 58 68" stroke={color} strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path d="M82 72 Q90 76 98 72" stroke={color} strokeWidth="3" strokeLinecap="round" fill="none" />
         </g>
     );
     if (expression === "love") return (
@@ -40,14 +40,14 @@ const Eyes = ({ expression, isBlinking, eyeOffset = { x: 0, y: 0 } }) => {
         </g>
     );
     return <g style={{ transform: `translate(${eyeOffset.x}px, ${eyeOffset.y}px)` }}>
-        <path id="Vector_7" d="M50.5 78.5C54.9183 78.5 58.5 74.9183 58.5 70.5C58.5 66.0817 54.9183 62.5 50.5 62.5C46.0817 62.5 42.5 66.0817 42.5 70.5C42.5 74.9183 46.0817 78.5 50.5 78.5Z" fill="#00F2FF" />
-        <path id="Vector_8" d="M90.5 78.5C94.9183 78.5 98.5 74.9183 98.5 70.5C98.5 66.0817 94.9183 62.5 90.5 62.5C86.0817 62.5 82.5 66.0817 82.5 70.5C82.5 74.9183 86.0817 78.5 90.5 78.5Z" fill="#00F2FF" />
+        <path id="Vector_7" d="M50.5 78.5C54.9183 78.5 58.5 74.9183 58.5 70.5C58.5 66.0817 54.9183 62.5 50.5 62.5C46.0817 62.5 42.5 66.0817 42.5 70.5C42.5 74.9183 46.0817 78.5 50.5 78.5Z" fill={color} />
+        <path id="Vector_8" d="M90.5 78.5C94.9183 78.5 98.5 74.9183 98.5 70.5C98.5 66.0817 94.9183 62.5 90.5 62.5C86.0817 62.5 82.5 66.0817 82.5 70.5C82.5 74.9183 86.0817 78.5 90.5 78.5Z" fill={color} />
     </g>;
 };
 
 
 // Mouth
-const Mouth = ({ expression }) => {
+const Mouth = ({ expression, color = "#00F2FF" }) => {
     // if (isSpeaking) {
     //     return (
     //         <path d="M 35 70 Q 50 85 65 70 Q 50 55 35 70" fill={strokeColor}>
@@ -56,12 +56,12 @@ const Mouth = ({ expression }) => {
     //         </path>
     //     );
     // }
-    if (expression === "happy") return <path id="Vector_6" d="M55.5 85.5C65.5 92.167 75.5 92.167 85.5 85.5" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" />;
-    if (expression === "sleepy") return <path id="Zzz" d="M111.608 34.5V32.6747L118.866 22.4901H111.594V19.9545H122.73V21.7798L115.464 31.9645H122.744V34.5H111.608ZM124.99 34.5V32.696L130.331 26.0838V26.0057H125.175V23.5909H133.975V25.5582L128.961 32.0071V32.0852H134.159V34.5H124.99ZM136.416 34.5V32.696L141.757 26.0838V26.0057H136.601V23.5909H145.401V25.5582L140.386 32.0071V32.0852H145.585V34.5H136.416Z" fill="#00F2FF" />;
-    if (expression === "excited") return <path id="Vector_3" d="M55.5 85.5L62.5 78.5L70.5 85.5L78.5 78.5L85.5 85.5" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" />;
-    if (expression === "confused") return <path d="M65 87 Q72 83 80 87 T95 87" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />;
-    if (expression === "love") return <path d="M65 85 Q70.5 93 76 85" stroke="#00F2FF" strokeWidth="3" strokeLinecap="round" fill="none" />;
-    return <path id="Vector_9" d="M70.5 94.5C73.8137 94.5 76.5 91.814 76.5 88.5C76.5 85.186 73.8137 82.5 70.5 82.5C67.1863 82.5 64.5 85.186 64.5 88.5C64.5 91.814 67.1863 94.5 70.5 94.5Z" stroke="#00F2FF" strokeWidth="2" />;
+    if (expression === "happy") return <path id="Vector_6" d="M55.5 85.5C65.5 92.167 75.5 92.167 85.5 85.5" stroke={color} strokeWidth="3" strokeLinecap="round" />;
+    if (expression === "sleepy") return <path id="Zzz" d="M111.608 34.5V32.6747L118.866 22.4901H111.594V19.9545H122.73V21.7798L115.464 31.9645H122.744V34.5H111.608ZM124.99 34.5V32.696L130.331 26.0838V26.0057H125.175V23.5909H133.975V25.5582L128.961 32.0071V32.0852H134.159V34.5H124.99ZM136.416 34.5V32.696L141.757 26.0838V26.0057H136.601V23.5909H145.401V25.5582L140.386 32.0071V32.0852H145.585V34.5H136.416Z" fill={color} />;
+    if (expression === "excited") return <path id="Vector_3" d="M55.5 85.5L62.5 78.5L70.5 85.5L78.5 78.5L85.5 85.5" stroke={color} strokeWidth="3" strokeLinecap="round" />;
+    if (expression === "confused") return <path d="M65 87 Q72 83 80 87 T95 87" stroke={color} strokeWidth="3" strokeLinecap="round" fill="none" />;
+    if (expression === "love") return <path d="M65 85 Q70.5 93 76 85" stroke={color} strokeWidth="3" strokeLinecap="round" fill="none" />;
+    return <path id="Vector_9" d="M70.5 94.5C73.8137 94.5 76.5 91.814 76.5 88.5C76.5 85.186 73.8137 82.5 70.5 82.5C67.1863 82.5 64.5 85.186 64.5 88.5C64.5 91.814 67.1863 94.5 70.5 94.5Z" stroke={color} strokeWidth="2" />;
 };
 
 const SECTION_CONTAINER_IDS = [
@@ -76,7 +76,7 @@ const SECTION_CONTAINER_IDS = [
     "recommendations"
 ];
 
-const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDoubleClick, onMouseDown, onMouseMove, isSpinning, isBlinking, eyeOffset, isWiggling, isDancing, isMoving, leanAngle = 0, isDragging, isIntroMode, ...props }) => {
+const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDoubleClick, onMouseDown, onMouseMove, isSpinning, isBlinking, eyeOffset, isWiggling, isDancing, isMoving, leanAngle = 0, isDragging, isIntroMode, color = "#00F2FF", ...props }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
@@ -179,7 +179,7 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
 
                         {/* Chest Panel */}
                         <rect x="50.5" y="115" width="40" height="12" rx="4" fill="#000" opacity="0.1" />
-                        <circle cx="60.5" cy="121" r="2.5" fill="#00F2FF">
+                        <circle cx="60.5" cy="121" r="2.5" fill={color}>
                             <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
                         </circle>
                         <circle cx="70.5" cy="121" r="2.5" fill="#FF4444">
@@ -191,8 +191,8 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
 
                         <path id="squre" d="M95.5 40.5H45.5C34.4543 40.5 25.5 49.4543 25.5 60.5V80.5C25.5 91.5457 34.4543 100.5 45.5 100.5H95.5C106.546 100.5 115.5 91.5457 115.5 80.5V60.5C115.5 49.4543 106.546 40.5 95.5 40.5Z" fill="url(#screenGradient)" stroke={isDark ? "#555" : "#CCC"} strokeWidth="1" />
                     </g>
-                    <Eyes expression={expression} isBlinking={isBlinking} eyeOffset={eyeOffset} />
-                    <Mouth expression={expression} />
+                    <Eyes expression={expression} isBlinking={isBlinking} eyeOffset={eyeOffset} color={color} />
+                    <Mouth expression={expression} color={color} />
                 </g>
             </g>
         </svg>
@@ -250,6 +250,7 @@ export default function RobotGuide({ isDark }) {
     const [isIntroMode, setIsIntroMode] = useState(false);
     const isIntroModeRef = useRef(false);
     const [robotSize, setRobotSize] = useState(100);
+    const [robotColor, setRobotColor] = useState("#00F2FF");
 
     useEffect(() => {
         const handleResize = () => {
@@ -259,6 +260,17 @@ export default function RobotGuide({ isDark }) {
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
+    const stopSpeaking = () => {
+        if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
+        if (typeof window !== "undefined" && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        setIsSpeaking(false);
+        isSpeakingRef.current = false;
+        setSpokenText("");
+        currentUtteranceRef.current = null;
+    };
 
     const speakAsync = (text) => {
         return new Promise((resolve) => {
@@ -477,6 +489,10 @@ export default function RobotGuide({ isDark }) {
             const sectionId = sectionEl.getAttribute('data-section');
 
             if (sectionId && (sectionId !== currentSectionRef.current || sectionEl !== highlightedElementRef.current)) {
+                if (sectionId !== currentSectionRef.current) {
+                    stopSpeaking();
+                }
+
                 if (highlightedElementRef.current) {
                     highlightedElementRef.current.style.outline = "";
                     highlightedElementRef.current.style.boxShadow = "";
@@ -486,6 +502,7 @@ export default function RobotGuide({ isDark }) {
 
                 const computedStyle = window.getComputedStyle(sectionEl);
                 const accentColor = computedStyle.getPropertyValue('--accent-color').trim() || '#00F2FF';
+                setRobotColor(accentColor);
 
                 if (!SECTION_CONTAINER_IDS.includes(sectionEl.id)) {
                     sectionEl.style.outline = `2px solid ${accentColor}`;
@@ -778,17 +795,6 @@ export default function RobotGuide({ isDark }) {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, []);
 
-    const stopSpeaking = () => {
-        if (speechTimeoutRef.current) clearTimeout(speechTimeoutRef.current);
-        if (typeof window !== "undefined" && window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-        }
-        setIsSpeaking(false);
-        isSpeakingRef.current = false;
-        setSpokenText("");
-        currentUtteranceRef.current = null;
-    };
-
     const handleMouseDown = (e) => {
         e.preventDefault();
         const startX = e.clientX;
@@ -1077,6 +1083,7 @@ export default function RobotGuide({ isDark }) {
                         leanAngle={leanAngle}
                         isDragging={isDragging}
                         isIntroMode={isIntroMode}
+                        color={robotColor}
                         width={robotSize}
                         height={robotSize}
                         role="button"
