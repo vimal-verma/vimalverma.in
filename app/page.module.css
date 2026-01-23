@@ -21,6 +21,9 @@
   background-color: var(--bg-color);
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
+  background-image: 
+    radial-gradient(circle at 15% 50%, color-mix(in srgb, var(--accent-color), transparent 96%) 0%, transparent 25%),
+    radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--accent-color), transparent 96%) 0%, transparent 25%);
 }
 
 /* Dark Mode Overrides */
@@ -97,7 +100,7 @@
   height: 2px;
   bottom: 0;
   left: 0;
-  background-color: #00F2FF;
+  background-color: var(--accent-color);
   transition: width 0.3s ease;
 }
 
@@ -208,7 +211,22 @@
   text-align: center;
   max-width: 700px;
   margin: 0 auto;
+  position: relative;
   animation: fadeIn 0.8s ease-out;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140%;
+  height: 140%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-color), transparent 90%) 0%, transparent 70%);
+  filter: blur(60px);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .title {
@@ -244,7 +262,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 1.5rem;
+  margin: 0;
   padding: 0.8rem 2rem;
   background-color: var(--text-primary);
   color: var(--bg-color);
@@ -264,6 +282,69 @@
   transform: translateY(-2px);
 }
 
+.heroButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.secondaryBtn {
+  background-color: transparent;
+  border: 2px solid var(--text-primary);
+  color: var(--text-primary);
+}
+
+.secondaryBtn:hover {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+.heroSocials {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2.5rem;
+  animation: fadeInUp 0.8s ease-out 0.6s forwards;
+  opacity: 0;
+}
+
+.socialIcon {
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+  padding: 10px;
+  border-radius: 50%;
+  background: var(--button-bg);
+  border: 1px solid var(--card-border);
+}
+
+.socialIcon:hover {
+  color: var(--accent-color);
+  transform: translateY(-3px);
+  border-color: var(--accent-color);
+  box-shadow: 0 5px 15px color-mix(in srgb, var(--accent-color), transparent 80%);
+}
+
+/* Sections with dynamic backgrounds */
+.projectsSection,
+.skillsSection,
+.experienceSection,
+.educationSection,
+.certificationSection,
+.blogSection,
+.recommendationsSection,
+.aboutSection,
+.contactSection {
+  padding: 3rem 1.5rem;
+  border-radius: 24px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-color), transparent 96%) 0%, transparent 100%);
+  margin-bottom: 3rem;
+}
+
+.recommendationsSection, .contactSection {
+  margin-bottom: 0;
+}
+
 /* Projects Section */
 .projectsSection h2,
 .skillsSection h2,
@@ -271,7 +352,8 @@
 .educationSection h2,
 .certificationSection h2,
 .blogSection h2,
-.recommendationsSection h2 {
+.recommendationsSection h2,
+.aboutSection h2 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
@@ -282,6 +364,49 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
+}
+
+/* About Section */
+.aboutContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .aboutContent {
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+.aboutImageWrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid var(--card-bg);
+  box-shadow: 0 10px 25px color-mix(in srgb, var(--accent-color), transparent 70%);
+  flex-shrink: 0;
+  animation: float 6s ease-in-out infinite;
+}
+
+.aboutImage {
+  object-fit: cover;
+}
+
+.aboutText {
+  flex: 1;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+.aboutText p {
+  margin-bottom: 1rem;
 }
 
 .card {
@@ -297,12 +422,13 @@
   justify-content: flex-start;
   align-items: flex-start;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(5px);
 }
 
 .card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-  border-color: #00F2FF;
+  box-shadow: 0 20px 40px -5px rgba(0,0,0,0.1);
+  border-color: var(--accent-color);
 }
 
 .cardLogo {
@@ -382,8 +508,8 @@
 .card:hover .cardButton {
   transform: translateY(-2px);
   background-color: var(--accent-color);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3);
+  color: var(--bg-color);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color), transparent 70%);
 }
 
 /* Experience Section */
@@ -463,8 +589,8 @@
 
 .skillBadge:hover {
   transform: translateY(-3px) scale(1.05);
-  border-color: #00F2FF;
-  box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
+  border-color: var(--accent-color);
+  box-shadow: 0 5px 15px color-mix(in srgb, var(--accent-color), transparent 80%);
 }
 
 .footer {
@@ -505,6 +631,42 @@
   cursor: pointer;
   font-size: 0.8rem;
   text-decoration: underline;
+}
+
+.backToTopBtn {
+  position: fixed;
+  bottom: 30px;
+  right: 90px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 99;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+}
+
+.backToTopBtn.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.backToTopBtn:hover {
+  background: var(--accent-color);
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px color-mix(in srgb, var(--accent-color), transparent 60%);
+  border-color: transparent;
 }
 
 /* Animations */
@@ -561,7 +723,7 @@
 .submitBtn {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(90deg, #00F2FF, #0078FF);
+  background: var(--accent-color);
   color: white;
   border: none;
   border-radius: 8px;
@@ -573,7 +735,7 @@
 
 .submitBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 242, 255, 0.3);
+  box-shadow: 0 5px 15px color-mix(in srgb, var(--accent-color), transparent 70%);
 }
 
 .submitBtn:disabled {
@@ -585,12 +747,16 @@
 .successMsg {
   margin-top: 15px;
   padding: 10px;
-  background: rgba(0, 242, 255, 0.1);
-  border: 1px solid rgba(0, 242, 255, 0.3);
+  background: color-mix(in srgb, var(--accent-color), transparent 90%);
+  border: 1px solid color-mix(in srgb, var(--accent-color), transparent 70%);
   border-radius: 8px;
-  color: #00F2FF;
+  color: var(--accent-color);
   text-align: center;
   animation: fadeInUp 0.5s ease;
+}
+
+.contactSection {
+  text-align: center;
 }
 
 .footer {

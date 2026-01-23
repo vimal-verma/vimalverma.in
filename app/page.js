@@ -5,6 +5,28 @@ import styles from "./page.module.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import RobotGuide from "./components/RobotGuide";
+import {
+  Download,
+  ExternalLink,
+  Briefcase,
+  GraduationCap,
+  Award,
+  BookOpen,
+  User,
+  Mail,
+  MessageSquare,
+  Send,
+  Quote,
+  ChevronLeft,
+  ChevronRight,
+  Code2,
+  Cpu,
+  Globe,
+  ArrowUp,
+  Github,
+  Linkedin,
+  Twitter
+} from "lucide-react";
 
 const SKILLS = [
   "JavaScript",
@@ -149,7 +171,7 @@ const ProjectCard = ({ project }) => (
         height={60}
         className={styles.cardLogo}
       />
-      <h3>{project.name} &rarr;</h3>
+      <h3 style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>{project.name} <ExternalLink size={18} /></h3>
     </div>
     <p>{project.desc}</p>
     <div className={styles.projectTags}>
@@ -157,14 +179,19 @@ const ProjectCard = ({ project }) => (
         <span key={tag} className={styles.projectTag}>{tag}</span>
       ))}
     </div>
-    <span className={styles.cardButton}>View Project</span>
+    <span className={styles.cardButton} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      View Project <ExternalLink size={16} />
+    </span>
   </a>
 );
 
-const TimelineItem = ({ title, subtitle, period, desc }) => (
+const TimelineItem = ({ title, subtitle, period, desc, icon: Icon }) => (
   <div className={styles.timelineItem}>
     <div className={styles.timelineContent}>
-      <h3>{title}</h3>
+      <h3 style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        {Icon && <Icon size={20} style={{ color: "var(--accent-color)" }} />}
+        {title}
+      </h3>
       <h4>{subtitle}</h4>
       <span className={styles.period}>{period}</span>
       <p>{desc}</p>
@@ -193,23 +220,26 @@ const BlogCard = ({ blog }) => (
         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
       />
     )}
-    <h3>{blog.title} &rarr;</h3>
+    <h3 style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>{blog.title} <ExternalLink size={18} /></h3>
     <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
       {new Date(blog.published_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
       <span style={{ margin: "0 8px" }}>•</span>
       {blog.positive_reactions_count} Likes
     </p>
     <p>{blog.description}</p>
-    <span className={styles.cardButton}>Read Article</span>
+    <span className={styles.cardButton} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+      Read Article <BookOpen size={16} />
+    </span>
   </a>
 );
 
 export default function Home() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   const [formStatus, setFormStatus] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [loadingBlogs, setLoadingBlogs] = useState(true);
   const recommendationsRef = useRef(null);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -267,6 +297,21 @@ export default function Home() {
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
   const toggleTheme = () => {
     setIsDark((prev) => {
       const newTheme = !prev;
@@ -291,123 +336,183 @@ export default function Home() {
           <p className={`${styles.description} ${styles.animateFadeUp} ${styles.delay3}`}>
             I love to build web apps. I have built multiple apps like NFCBuzz.com, WebNfc.org, KnowBihar.in, Vdev.in and more.
           </p>
-          <a
-            href="/resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`${styles.ctaButton} ${styles.animateFadeUp} ${styles.delay3}`}
-            data-narrate="You can download Vimal's full resume here to see his complete professional journey."
-            data-section="Resume"
-          >
-            Download Resume
-          </a>
+
+          <div className={`${styles.heroButtons} ${styles.animateFadeUp} ${styles.delay3}`}>
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.ctaButton}
+              data-narrate="You can download Vimal's full resume here to see his complete professional journey."
+              data-section="Resume"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <Download size={18} /> Download Resume
+            </a>
+            <a
+              href="#contact"
+              className={`${styles.ctaButton} ${styles.secondaryBtn}`}
+              data-narrate="Jump to the contact form to send a message."
+              data-section="Contact"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
+            >
+              <Mail size={18} /> Contact Me
+            </a>
+          </div>
+
+          <div className={styles.heroSocials}>
+            <a href="https://github.com/vimal-verma" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className={styles.socialIcon}>
+              <Github size={24} />
+            </a>
+            <a href="https://www.linkedin.com/in/vimal-verma/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className={styles.socialIcon}>
+              <Linkedin size={24} />
+            </a>
+            <a href="https://twitter.com/vimalverma_in" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className={styles.socialIcon}>
+              <Twitter size={24} />
+            </a>
+          </div>
         </section>
 
         <section className={styles.contentSection}>
 
-        <div id="projects" className={styles.projectsSection} data-narrate="Here are some of the exciting projects Vimal has built. Feel free to hover over them for details." data-section="Projects">
-          <h2>My Projects</h2>
-          <div className={styles.grid}>
-            {PROJECTS.map((project) => (
-              <ProjectCard key={project.name} project={project} />
-            ))}
+          <div id="about" className={styles.aboutSection} style={{ "--accent-color": "#6366F1" }} data-narrate="Learn more about Vimal's background and passion for technology." data-section="About">
+            <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}>
+              <User size={28} /> About Me
+            </h2>
+            <div className={styles.aboutContent}>
+              <div className={styles.aboutImageWrapper}>
+                <Image
+                  src="/profile.jpg"
+                  alt="Vimal Kumar"
+                  fill
+                  className={styles.aboutImage}
+                  sizes="(max-width: 768px) 200px, 250px"
+                  priority
+                />
+              </div>
+              <div className={styles.aboutText}>
+                <p>
+                  Hello! I&apos;m Vimal Kumar, a dedicated Software Developer with a passion for building digital solutions that make a difference. With a Bachelor&apos;s degree in Computer Science and years of hands-on experience, I specialize in creating robust web applications using modern technologies like React, Next.js, and Node.js.
+                </p>
+                <p>
+                  My journey in tech is driven by curiosity and a desire to solve real-world problems. Whether it&apos;s exploring the potential of Web NFC or architecting scalable frontend systems, I love diving deep into code and emerging with elegant solutions.
+                </p>
+                <p>
+                  When I&apos;m not coding, you can find me writing technical articles, mentoring aspiring developers, or exploring the latest trends in the tech industry.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div id="skills" className={styles.skillsSection} data-narrate="Vimal has a diverse skill set, ranging from React and Next JS to NFC Technology." data-section="Skills">
-          <h2>Skills & Technologies</h2>
-          <div className={styles.skillsList}>
-            {SKILLS.map((skill) => (
-              <span key={skill} className={styles.skillBadge} data-narrate={`Skill: ${skill}`} data-section="Skills">
-                {skill}
-              </span>
-            ))}
+          <div id="projects" className={styles.projectsSection} style={{ "--accent-color": "#00F2FF" }} data-narrate="Here are some of the exciting projects Vimal has built. Feel free to hover over them for details." data-section="Projects">
+            <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Globe size={28} /> My Projects</h2>
+            <div className={styles.grid}>
+              {PROJECTS.map((project) => (
+                <ProjectCard key={project.name} project={project} />
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div id="experience" className={styles.experienceSection} data-narrate="Here is a timeline of Vimal's professional work experience and career growth." data-section="Experience">
-          <h2>Work Experience</h2>
-          <div className={styles.timeline}>
-            {EXPERIENCE.map((job, index) => (
-              <TimelineItem
-                key={index}
-                title={job.role}
-                subtitle={job.company}
-                period={job.period}
-                desc={job.desc}
-              />
-            ))}
+          <div id="skills" className={styles.skillsSection} style={{ "--accent-color": "#FF0080" }} data-narrate="Vimal has a diverse skill set, ranging from React and Next JS to NFC Technology." data-section="Skills">
+            <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Cpu size={28} /> Skills & Technologies</h2>
+            <div className={styles.skillsList}>
+              {SKILLS.map((skill) => (
+                <span key={skill} className={styles.skillBadge} data-narrate={`Skill: ${skill}`} data-section="Skills" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Code2 size={16} />
+                  {skill}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div id="education" className={styles.educationSection} data-narrate="Vimal's educational background." data-section="Education">
-          <h2>Education</h2>
-          <div className={styles.timeline}>
-            {EDUCATION.map((edu, index) => (
-              <TimelineItem
-                key={index}
-                title={edu.degree}
-                subtitle={edu.institution}
-                period={edu.year}
-                desc={edu.desc}
-              />
-            ))}
+          <div id="experience" className={styles.experienceSection} style={{ "--accent-color": "#7928CA" }} data-narrate="Here is a timeline of Vimal's professional work experience and career growth." data-section="Experience">
+            <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Briefcase size={28} /> Work Experience</h2>
+            <div className={styles.timeline}>
+              {EXPERIENCE.map((job, index) => (
+                <TimelineItem
+                  key={index}
+                  title={job.role}
+                  subtitle={job.company}
+                  period={job.period}
+                  desc={job.desc}
+                  icon={Briefcase}
+                />
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div id="certifications" className={styles.certificationSection} data-narrate="Certifications earned by Vimal." data-section="Certifications">
-          <h2>Certifications</h2>
-          <div className={styles.grid}>
-            {CERTIFICATIONS.map((cert, index) => (
+          <div id="education" className={styles.educationSection} style={{ "--accent-color": "#FF4D4D" }} data-narrate="Vimal's educational background." data-section="Education">
+            <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><GraduationCap size={28} /> Education</h2>
+            <div className={styles.timeline}>
+              {EDUCATION.map((edu, index) => (
+                <TimelineItem
+                  key={index}
+                  title={edu.degree}
+                  subtitle={edu.institution}
+                  period={edu.year}
+                  desc={edu.desc}
+                  icon={GraduationCap}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div id="certifications" className={styles.certificationSection} style={{ "--accent-color": "#F5A623" }} data-narrate="Certifications earned by Vimal." data-section="Certifications">
+            <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Award size={28} /> Certifications</h2>
+            <div className={styles.grid}>
+              {CERTIFICATIONS.map((cert, index) => (
+                <a
+                  key={index}
+                  href={cert.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.card}
+                  data-narrate={`Certification: ${cert.title}`}
+                  data-section="Certifications"
+                >
+                  <h3 style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>{cert.title} <ExternalLink size={18} /></h3>
+                  <p style={{ fontWeight: 500, color: "var(--text-primary)", marginBottom: "0.5rem" }}>{cert.issuer} &bull; {cert.date}</p>
+                  <p>{cert.desc}</p>
+                  <span className={styles.cardButton} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    View Certificate <Award size={16} />
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div id="blog" className={styles.blogSection} style={{ "--accent-color": "#10B981" }} data-narrate="Read my latest articles from Dev.to." data-section="Blog">
+            <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><BookOpen size={28} /> Latest Articles</h2>
+            <div className={styles.grid}>
+              {loadingBlogs ? (
+                <p style={{ textAlign: "center", width: "100%", color: "var(--text-secondary)" }}>Loading articles...</p>
+              ) : (
+                blogs.slice(0, 4).map((blog) => <BlogCard key={blog.id} blog={blog} />)
+              )}
+            </div>
+            <div style={{ textAlign: "center", marginTop: "2rem" }}>
               <a
-                key={index}
-                href={cert.url}
+                href="https://dev.to/vimal"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={styles.card}
-                data-narrate={`Certification: ${cert.title}`}
-                data-section="Certifications"
+                className={styles.ctaButton}
+                style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
               >
-                <h3>{cert.title} &rarr;</h3>
-                <p style={{ fontWeight: 500, color: "var(--text-primary)", marginBottom: "0.5rem" }}>{cert.issuer} &bull; {cert.date}</p>
-                <p>{cert.desc}</p>
-                <span className={styles.cardButton}>View Certificate</span>
+                View more Articles <ExternalLink size={18} />
               </a>
-            ))}
-          </div>
-        </div>
-
-        <div id="blog" className={styles.blogSection} data-narrate="Read my latest articles from Dev.to." data-section="Blog">
-          <h2>Latest Articles</h2>
-          <div className={styles.grid}>
-            {loadingBlogs ? (
-              <p style={{ textAlign: "center", width: "100%", color: "var(--text-secondary)" }}>Loading articles...</p>
-            ) : (
-              blogs.slice(0, 4).map((blog) => <BlogCard key={blog.id} blog={blog} />)
-            )}
-          </div>
-          <div style={{ textAlign: "center", marginTop: "2rem" }}>
-            <a
-              href="https://dev.to/vimal"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.ctaButton}
-            >
-              View more Articles
-            </a>
             </div>
-            </div>
+          </div>
         </section>
 
-        <section id="recommendations" className={styles.recommendationsSection} data-narrate="Here is what people are saying about Vimal on LinkedIn." data-section="Recommendations">
-          <h2>LinkedIn Recommendations</h2>
+        <section id="recommendations" className={styles.recommendationsSection} style={{ "--accent-color": "#8B5CF6" }} data-narrate="Here is what people are saying about Vimal on LinkedIn." data-section="Recommendations">
+          <h2 style={{ display: "flex", alignItems: "center", gap: "0.75rem", color: "var(--accent-color)" }}><MessageSquare size={28} /> LinkedIn Recommendations</h2>
           <div className={styles.carouselContainer}>
             <button
               className={`${styles.carouselNavBtn} ${styles.prevBtn}`}
               onClick={() => scrollRecommendations('left')}
               aria-label="Previous Recommendation"
             >
-              &larr;
+              <ChevronLeft size={24} />
             </button>
             <div className={styles.carouselTrack} ref={recommendationsRef}>
               {RECOMMENDATIONS.map((rec, index) => (
@@ -417,6 +522,7 @@ export default function Home() {
                   data-narrate={`Recommendation from ${rec.name}`}
                   data-section="Recommendations"
                 >
+                  <Quote size={32} style={{ color: "var(--accent-color)", opacity: 0.3, marginBottom: "1rem" }} />
                   <p style={{ fontStyle: "italic", marginBottom: "1.5rem", color: "var(--text-secondary)", lineHeight: "1.6" }}>&quot;{rec.text}&quot;</p>
                   <div style={{ marginTop: "auto", borderTop: "1px solid var(--card-border)", paddingTop: "1rem", width: "100%" }}>
                     <h3 style={{ fontSize: "1.1rem", marginBottom: "0.2rem" }}>{rec.name}</h3>
@@ -430,23 +536,24 @@ export default function Home() {
               onClick={() => scrollRecommendations('right')}
               aria-label="Next Recommendation"
             >
-              &rarr;
+              <ChevronRight size={24} />
             </button>
           </div>
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center", marginTop: "2rem" }}>
             <a
               href="https://www.linkedin.com/in/vimal-verma/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.ctaButton}
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem" }}
             >
-              View on LinkedIn
+              View on LinkedIn <ExternalLink size={18} />
             </a>
           </div>
         </section>
 
-        <section id="contact" style={{ padding: "80px 20px", textAlign: "center" }} data-narrate="Ready to collaborate? Use this form to send a message directly to Vimal." data-section="Contact">
-          <h2>Get In Touch</h2>
+        <section id="contact" className={styles.contactSection} style={{ "--accent-color": "#14B8A6" }} data-narrate="Ready to collaborate? Use this form to send a message directly to Vimal." data-section="Contact">
+          <h2 style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", color: "var(--accent-color)" }}><Mail size={28} /> Get In Touch</h2>
           <p style={{ marginBottom: "40px", opacity: 0.8, maxWidth: "600px", margin: "0 auto 40px" }}>
             Have a project in mind or just want to say hi? Fill out the form below and I&apos;ll get back to you as soon as possible.
           </p>
@@ -454,24 +561,32 @@ export default function Home() {
           <div className={styles.contactFormContainer}>
             <form onSubmit={handleContactSubmit}>
               <div className={styles.formGroup} >
-                <label htmlFor="name" className={styles.formLabel}>Name</label>
+                <label htmlFor="name" className={styles.formLabel} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}><User size={16} /> Name</label>
                 <input type="text" id="name" name="name" required className={styles.formInput} placeholder="Your Name" data-narrate="Enter your name here." data-section="Contact" />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="email" className={styles.formLabel}>Email</label>
+                <label htmlFor="email" className={styles.formLabel} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}><Mail size={16} /> Email</label>
                 <input type="email" id="email" name="email" required className={styles.formInput} placeholder="your@email.com" data-narrate="Enter your email address so Vimal can reply." data-section="Contact" />
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="message" className={styles.formLabel}>Message</label>
+                <label htmlFor="message" className={styles.formLabel} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}><MessageSquare size={16} /> Message</label>
                 <textarea id="message" name="message" required rows="5" className={styles.formTextarea} placeholder="Your Message" data-narrate="Type your message or project details here." data-section="Contact"></textarea>
               </div>
-              <button type="submit" className={styles.submitBtn} disabled={formStatus === 'submitting' || formStatus === 'success'} aria-live="polite">
-                {formStatus === 'submitting' ? 'Sending...' : (formStatus === 'success' ? 'Message Sent!' : 'Send Message')}
+              <button type="submit" className={styles.submitBtn} disabled={formStatus === 'submitting' || formStatus === 'success'} aria-live="polite" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
+                {formStatus === 'submitting' ? 'Sending...' : (formStatus === 'success' ? 'Message Sent!' : <><Send size={18} /> Send Message</>)}
               </button>
               {formStatus === 'success' && <div className={styles.successMsg} role="alert">Thanks for reaching out! I&apos;ll get back to you soon.</div>}
             </form>
           </div>
         </section>
+
+        <button
+          className={`${styles.backToTopBtn} ${showBackToTop ? styles.visible : ""}`}
+          onClick={scrollToTop}
+          aria-label="Back to Top"
+        >
+          <ArrowUp size={24} />
+        </button>
       </main>
       <Footer />
     </div>
