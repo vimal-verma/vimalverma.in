@@ -484,9 +484,12 @@ export default function RobotGuide({ isDark }) {
                 currentSectionRef.current = sectionId;
                 highlightedElementRef.current = sectionEl;
 
+                const computedStyle = window.getComputedStyle(sectionEl);
+                const accentColor = computedStyle.getPropertyValue('--accent-color').trim() || '#00F2FF';
+
                 if (!SECTION_CONTAINER_IDS.includes(sectionEl.id)) {
-                    sectionEl.style.outline = "2px solid #00F2FF";
-                    sectionEl.style.boxShadow = "0 0 20px rgba(0, 242, 255, 0.3)";
+                    sectionEl.style.outline = `2px solid ${accentColor}`;
+                    sectionEl.style.boxShadow = `0 0 20px color-mix(in srgb, ${accentColor}, transparent 70%)`;
                 }
 
                 // Responsive positioning logic

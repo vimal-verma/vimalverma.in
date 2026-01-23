@@ -305,11 +305,32 @@ export default function Home() {
   const handleContactSubmit = async (e) => {
     e.preventDefault();
     setFormStatus('submitting');
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setFormStatus('success');
-    e.target.reset();
-    setTimeout(() => setFormStatus(null), 5000);
+
+    const formData = {
+      name: e.target.name.value,
+      email: e.target.email.value,
+      message: e.target.message.value,
+      sendto: "vimal"
+    };
+
+    try {
+      const res = await fetch("https://api.vdev.in/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        setFormStatus('success');
+        e.target.reset();
+        setTimeout(() => setFormStatus(null), 5000);
+      } else {
+        setFormStatus(null);
+      }
+    } catch (error) {
+      console.error(error);
+      setFormStatus(null);
+    }
   };
 
   useEffect(() => {
@@ -383,6 +404,7 @@ export default function Home() {
     });
   };
 
+  let showDEVto = () => new Date().getMonth() < 3 && new Date().getFullYear() <= 2026 ? 1 : 0;
   return (
     <div className={`${styles.page} ${isDark ? styles.darkMode : ""}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
@@ -393,7 +415,9 @@ export default function Home() {
         <section id="introduction" className={styles.hero} data-narrate="Welcome! I am Vimal's virtual assistant. Let me introduce you to Vimal, a passionate Software Developer and Web App Creator." data-section="Introduction">
           <div className={`${styles.statusBadge} ${styles.animateFadeUp} ${styles.delay1}`}>
             <span className={styles.statusDot}></span>
-            Available for new projects
+            {showDEVto() === 1 ? "New Year, New You Portfolio Challenge " :
+              "Available for new projects!"
+            }
           </div>
           <h1 className={`${styles.title} ${styles.animateFadeUp} ${styles.delay1}`}>
             <span className={styles.gradientText}>Vimal Kumar</span> <span className={styles.handle}>(VimalVerma)</span>
@@ -402,7 +426,7 @@ export default function Home() {
             Software Developer | Web App Creator
           </p>
           <p className={`${styles.description} ${styles.animateFadeUp} ${styles.delay3}`}>
-            I love to build web apps. I have built multiple apps like NFCBuzz.com, WebNfc.org, KnowBihar.in, Vdev.in and more.
+            I love to build digital solutions that make a difference. Love exploring new technologies and turning ideas into reality through code.
           </p>
 
           <div className={`${styles.heroButtons} ${styles.animateFadeUp} ${styles.delay3}`}>
@@ -438,6 +462,13 @@ export default function Home() {
             <a href="https://twitter.com/vimalverma_in" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className={styles.socialIcon}>
               <Twitter size={24} />
             </a>
+          </div>
+
+          <div className={styles.scrollDown} onClick={() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' })}>
+            <div className={styles.mouse}>
+              <div className={styles.wheel}></div>
+            </div>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Scroll Down</span>
           </div>
         </section>
 
