@@ -287,6 +287,9 @@ export default function RobotGuide({ isDark, toggleTheme }) {
     const terminalDragOffsetRef = useRef({ x: 0, y: 0 });
     const [terminalSize, setTerminalSize] = useState({ width: 600, height: 400 });
     const resizeStartRef = useRef({ x: 0, y: 0, w: 0, h: 0 });
+    const [terminalMode, setTerminalMode] = useState('command');
+    const [terminalFormData, setTerminalFormData] = useState({ name: "", email: "", message: "" });
+    const [historyPointer, setHistoryPointer] = useState(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -306,6 +309,9 @@ export default function RobotGuide({ isDark, toggleTheme }) {
     useEffect(() => {
         if (!showTerminal) {
             setTerminalPos(null);
+            setTerminalMode('command');
+            setTerminalFormData({ name: "", email: "", message: "" });
+            setHistoryPointer(null);
         }
     }, [showTerminal]);
 
@@ -972,18 +978,136 @@ export default function RobotGuide({ isDark, toggleTheme }) {
         window.addEventListener("mouseup", handleMouseUp);
     };
 
-    const handleCommand = (e) => {
+    const handleTerminalKeyDown = (e) => {
+        if (terminalMode !== 'command') return;
+
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const commands = [
+                "help", "resume", "about", "projects", "skills", "experience",
+                "education", "certifications", "blog", "contact", "recommendations",
+                "joke", "theme", "time", "game", "guide", "stop", "message", "clear", "exit"
+            ];
+            const input = terminalInput.trim().toLowerCase();
+            if (!input) return;
+
+            const matches = commands.filter(cmd => cmd.startsWith(input));
+            if (matches.length === 1) {
+                setTerminalInput(matches[0]);
+            } else if (matches.length > 1) {
+                let commonPrefix = matches[0];
+                for (let i = 1; i < matches.length; i++) {
+                    while (!matches[i].startsWith(commonPrefix)) {
+                        commonPrefix = commonPrefix.substring(0, commonPrefix.length - 1);
+                    }
+                }
+                setTerminalInput(commonPrefix);
+            }
+            return;
+        }
+
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const commands = terminalHistory.filter(h => h.type === 'input').map(h => h.content);
+            if (commands.length === 0) return;
+
+            let newPointer = historyPointer;
+            if (newPointer === null) {
+                newPointer = commands.length - 1;
+            } else {
+                newPointer = Math.max(0, newPointer - 1);
+            }
+            setHistoryPointer(newPointer);
+            setTerminalInput(commands[newPointer]);
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const commands = terminalHistory.filter(h => h.type === 'input').map(h => h.content);
+            if (historyPointer === null) return;
+
+            let newPointer = historyPointer + 1;
+            if (newPointer >= commands.length) {
+                setHistoryPointer(null);
+                setTerminalInput("");
+            } else {
+                setHistoryPointer(newPointer);
+                setTerminalInput(commands[newPointer]);
+            }
+        }
+    };
+
+    const handleCommand = async (e) => {
         e.preventDefault();
-        const cmd = terminalInput.trim().toLowerCase();
-        if (!cmd) return;
+        const rawInput = terminalInput.trim();
+        if (!rawInput) return;
 
         const inputId = Date.now();
-        const newHistory = [...terminalHistory, { type: 'input', content: cmd, id: inputId }];
+        const currentHistory = [...terminalHistory, { type: 'input', content: rawInput, id: inputId }];
+        setTerminalInput("");
+        setHistoryPointer(null);
+
+        if (terminalMode !== 'command') {
+            let responseMsg = "";
+            let nextMode = terminalMode;
+            let nextData = { ...terminalFormData };
+            let shouldSubmit = false;
+
+            if (terminalMode === 'input_name') {
+                if (rawInput.length < 2) {
+                    responseMsg = "Name is too short. Please enter your name:";
+                } else {
+                    nextData.name = rawInput;
+                    nextMode = 'input_email';
+                    responseMsg = "Please enter your email:";
+                }
+            } else if (terminalMode === 'input_email') {
+                if (!/^\S+@\S+\.\S+$/.test(rawInput)) {
+                    responseMsg = "Invalid email format. Please enter your email:";
+                } else {
+                    nextData.email = rawInput;
+                    nextMode = 'input_message';
+                    responseMsg = "Please enter your message:";
+                }
+            } else if (terminalMode === 'input_message') {
+                if (rawInput.length < 10) {
+                    responseMsg = "Message is too short. Please enter your message:";
+                } else {
+                    nextData.message = rawInput;
+                    nextMode = 'command';
+                    shouldSubmit = true;
+                    responseMsg = "Sending message...";
+                }
+            }
+
+            setTerminalMode(nextMode);
+            setTerminalFormData(nextData);
+            setTerminalHistory([...currentHistory, { type: 'output', content: responseMsg, id: Date.now() + 10 }]);
+
+            if (shouldSubmit) {
+                try {
+                    const res = await fetch("https://api.vdev.in/message", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ...nextData, sendto: "vimal" }),
+                    });
+
+                    const resultMsg = res.ok ? "Message sent successfully! I'll get back to you soon." : "Failed to send message. Please try again later.";
+                    setTerminalHistory(prev => [...prev, { type: 'output', content: resultMsg, id: Date.now() + 20 }]);
+                    setExpression(res.ok ? "happy" : "confused");
+                } catch (error) {
+                    setTerminalHistory(prev => [...prev, { type: 'output', content: "Error: Could not connect to server.", id: Date.now() + 20 }]);
+                    setExpression("confused");
+                }
+                setTerminalFormData({ name: "", email: "", message: "" });
+            }
+            return;
+        }
+
+        const cmd = rawInput.toLowerCase();
         let response = "";
 
         switch (cmd) {
             case "help":
-                response = "Available commands: help, resume, about, projects, skills, experience, contact, joke, theme, time, clear, exit";
+                response = "Available commands: help, resume, about, projects, skills, experience, contact, joke, theme, time, game, guide, stop, message, clear, exit";
                 break;
             case "resume":
                 response = "Opening resume...";
@@ -1021,6 +1145,31 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                 response = `Current time is: ${new Date().toLocaleTimeString()}`;
                 setExpression("happy");
                 break;
+            case "game":
+                startGame();
+                response = "Starting mini-game... Catch the energy bolts!";
+                setShowTerminal(false);
+                break;
+            case "guide":
+                startIntro();
+                response = "Starting guided tour...";
+                setShowTerminal(false);
+                break;
+            case "stop":
+                if (isGameActive) {
+                    stopGame();
+                    response = "Game stopped.";
+                } else if (isIntroMode) {
+                    stopIntro();
+                    response = "Guide stopped.";
+                } else {
+                    response = "Nothing active to stop.";
+                }
+                break;
+            case "message":
+                setTerminalMode('input_name');
+                response = "Please enter your name:";
+                break;
             case "joke":
                 const jokes = [
                     "Why do programmers prefer dark mode? Because light attracts bugs.",
@@ -1047,8 +1196,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                 setExpression("confused");
         }
         const outputId = Date.now() + 10;
-        setTerminalHistory([...newHistory, { type: 'output', content: response, id: outputId }]);
-        setTerminalInput("");
+        setTerminalHistory([...currentHistory, { type: 'output', content: response, id: outputId }]);
     };
 
     const handleRobotDoubleClick = (e) => {
@@ -1271,7 +1419,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                         background: "rgba(0,0,0,0.3)"
                     }}>
                         <span style={{ color: "#00F2FF" }}>$</span>
-                        <input id="terminal-input" type="text" value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} autoFocus autoComplete="off" style={{ flex: 1, background: "none", border: "none", color: "#fff", fontFamily: "inherit", fontSize: "14px", outline: "none" }} placeholder="Type command..." />
+                        <input id="terminal-input" type="text" value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} onKeyDown={handleTerminalKeyDown} autoFocus autoComplete="off" style={{ flex: 1, background: "none", border: "none", color: "#fff", fontFamily: "inherit", fontSize: "14px", outline: "none" }} placeholder="Type command..." />
                     </form>
                     <div
                         onMouseDown={handleResizeMouseDown}
