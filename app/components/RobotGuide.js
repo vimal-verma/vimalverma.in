@@ -119,7 +119,7 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
                 transformOrigin: "center",
                 cursor: isDragging ? "grabbing" : "grab",
                 transition: "transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                animation: isDancing ? "dance 0.6s ease-in-out infinite" : "none",
+                animation: isDancing ? "robot-dance-bounce 0.5s ease-in-out infinite" : "none",
                 filter: "drop-shadow(0px 10px 10px rgba(0,0,0,0.2))"
             }}
         >
@@ -137,6 +137,21 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
                     <stop offset="50%" stopColor={isDark ? "#333" : "#fff"} />
                     <stop offset="100%" stopColor={isDark ? "#222" : "#eee"} />
                 </linearGradient>
+                <style>{`
+                    @keyframes robot-dance-bounce {
+                        0%, 100% { transform: translateY(0) rotate(0deg); }
+                        25% { transform: translateY(-15px) rotate(-5deg); }
+                        75% { transform: translateY(-5px) rotate(5deg); }
+                    }
+                    @keyframes robot-dance-arm-left {
+                        0%, 100% { transform: rotate(0deg); }
+                        50% { transform: rotate(130deg); }
+                    }
+                    @keyframes robot-dance-arm-right {
+                        0%, 100% { transform: rotate(0deg); }
+                        50% { transform: rotate(-130deg); }
+                    }
+                `}</style>
             </defs>
 
             {/* Dynamic Shadow */}
@@ -190,11 +205,11 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
                         )}
 
                         {/* Arms */}
-                        <g style={{ transformOrigin: "10px 80px", transform: isMoving ? "rotate(10deg)" : "rotate(0deg)", transition: "transform 0.5s" }}>
+                        <g style={{ transformOrigin: "10px 80px", animation: isDancing ? "robot-dance-arm-left 0.5s ease-in-out infinite" : "none", transform: !isDancing && isMoving ? "rotate(10deg)" : "rotate(0deg)", transition: "transform 0.5s" }}>
                             <path d="M10 80 C-15 95 -15 115 10 125" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
                             <circle cx="10" cy="125" r="6" fill={isDark ? "#666" : "#333"} />
                         </g>
-                        <g style={{ transformOrigin: "131px 80px", animation: isHovered ? "wave 1s ease-in-out infinite" : (isMoving ? "wave 2s ease-in-out infinite" : "none") }}>
+                        <g style={{ transformOrigin: "131px 80px", animation: isDancing ? "robot-dance-arm-right 0.5s ease-in-out infinite" : (isHovered ? "wave 1s ease-in-out infinite" : (isMoving ? "wave 2s ease-in-out infinite" : "none")) }}>
                             <path d="M131 80 C156 95 156 115 131 125" stroke={isDark ? "#D0D0D0" : "#1A1A1A"} strokeWidth="6" strokeLinecap="round" fill="none" />
                             <circle cx="131" cy="125" r="6" fill={isDark ? "#666" : "#333"} />
                         </g>
@@ -314,6 +329,30 @@ export default function RobotGuide({ isDark, toggleTheme }) {
             setHistoryPointer(null);
         }
     }, [showTerminal]);
+
+    useEffect(() => {
+        if (showTerminal) {
+            const termW = terminalSize.width;
+            const termH = terminalSize.height;
+            let termX, termY;
+
+            if (terminalPos) {
+                termX = terminalPos.x;
+                termY = terminalPos.y;
+            } else {
+                termX = (window.innerWidth - termW) / 2;
+                termY = (window.innerHeight - termH) / 2;
+            }
+
+            setRobotPosition({
+                position: "fixed",
+                left: `${termX + termW / 2 - robotSize / 2}px`,
+                top: `${termY - robotSize + 30}px`,
+                zIndex: 3001,
+                transition: terminalPos ? "none" : "all 0.3s ease-out"
+            });
+        }
+    }, [showTerminal, terminalPos, terminalSize, robotSize]);
 
     useEffect(() => {
         setTerminalSize({
@@ -547,6 +586,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
         allSectionsRef.current = [...new Set(sections)];
 
         const activateSection = (sectionEl) => {
+            if (showTerminal) return;
             const sectionId = sectionEl.getAttribute('data-section');
 
             if (sectionId && (sectionId !== currentSectionRef.current || sectionEl !== highlightedElementRef.current)) {
@@ -749,7 +789,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hasStarted, isSoundEnabled]);
+    }, [hasStarted, isSoundEnabled, showTerminal]);
 
     const startGame = () => {
         setIsGameActive(true);
@@ -830,6 +870,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
 
     useEffect(() => {
         const handleKeyDown = (e) => {
+            if (showTerminal) return;
             if (!containerRef.current) return;
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
                 e.preventDefault();
@@ -854,7 +895,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
         };
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, []);
+    }, [showTerminal]);
 
     const handleMouseDown = (e) => {
         e.preventDefault();
@@ -986,7 +1027,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
             const commands = [
                 "help", "resume", "about", "projects", "skills", "experience",
                 "education", "certifications", "blog", "contact", "recommendations",
-                "joke", "theme", "time", "game", "guide", "stop", "message", "clear", "exit"
+                "joke", "theme", "time", "game", "guide", "stop", "message", "robot", "clear", "exit"
             ];
             const input = terminalInput.trim().toLowerCase();
             if (!input) return;
@@ -1102,12 +1143,14 @@ export default function RobotGuide({ isDark, toggleTheme }) {
             return;
         }
 
-        const cmd = rawInput.toLowerCase();
+        const parts = rawInput.toLowerCase().split(/\s+/);
+        const cmd = parts[0];
+        const args = parts.slice(1);
         let response = "";
 
         switch (cmd) {
             case "help":
-                response = "Available commands: help, resume, about, projects, skills, experience, contact, joke, theme, time, game, guide, stop, message, clear, exit";
+                response = "Available commands: help, resume, about, projects, skills, experience, contact, joke, theme, time, game, guide, stop, message, robot, clear, exit";
                 break;
             case "resume":
                 response = "Opening resume...";
@@ -1147,13 +1190,11 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                 break;
             case "game":
                 startGame();
-                response = "Starting mini-game... Catch the energy bolts!";
-                setShowTerminal(false);
+                response = "Starting mini-game... Catch the energy bolts!, type 'stop' to end.";
                 break;
             case "guide":
                 startIntro();
-                response = "Starting guided tour...";
-                setShowTerminal(false);
+                response = "Starting guided tour..., type 'stop' to end.";
                 break;
             case "stop":
                 if (isGameActive) {
@@ -1164,6 +1205,29 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                     response = "Guide stopped.";
                 } else {
                     response = "Nothing active to stop.";
+                }
+                break;
+            case "robot":
+                const validExpressions = ["dance", "happy", "excited", "sleepy", "confused", "love"];
+                if (args.length > 0) {
+                    if (args[0] === "dance") {
+                        setIsDancing(true);
+                        setExpression("excited");
+                        response = "Let's dance!";
+                        setTimeout(() => {
+                            setIsDancing(false);
+                            setExpression("happy");
+                        }, 5000);
+                    } else if (validExpressions.includes(args[0])) {
+                        setExpression(args[0]);
+                        response = `Expression changed to ${args[0]}.`;
+                    } else {
+                        response = `Usage: robot <expression|dance>. Valid: ${validExpressions.join(", ")}`;
+                        setExpression("confused");
+                    }
+                } else {
+                    response = `Usage: robot <expression|dance>. Valid: ${validExpressions.join(", ")}`;
+                    setExpression("confused");
                 }
                 break;
             case "message":
@@ -1401,8 +1465,8 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                         {terminalHistory.map((line) => (
                             <div key={line.id} style={{ marginBottom: "5px", color: line.type === 'input' ? '#aaa' : '#00F2FF' }}>
                                 {line.type === 'input' ? '> ' : ''}
-                                <Typewriter 
-                                    text={line.content} 
+                                <Typewriter
+                                    text={line.content}
                                     animate={line.type === 'output' && line.id > lastAnimatedIdRef.current}
                                     onComplete={() => { lastAnimatedIdRef.current = Math.max(lastAnimatedIdRef.current, line.id); }}
                                 />
