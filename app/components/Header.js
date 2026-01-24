@@ -21,7 +21,7 @@ export default function Header({ isDark, toggleTheme }) {
     }, [isMobileMenuOpen]);
 
     return (
-        <header className={styles.header}>
+        <header className={styles.header} style={{ position: "fixed", top: 0, left: "50%", transform: "translateX(-50%)", width: "100%", zIndex: 1000 }}>
             <div className={styles.logo} data-narrate="Vimal Kumar" data-section="Header">VimalVerma</div>
 
             {/* Desktop Navigation */}

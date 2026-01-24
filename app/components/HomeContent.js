@@ -73,31 +73,37 @@ const SKILL_CATEGORIES = [
 
 const EXPERIENCE = [
     {
-        company: "Tech Solutions Inc.",
-        role: "Senior Frontend Developer",
-        period: "2023 - Present",
+        company: "Cognizant",
+        role: "Developer",
+        period: "2022 - Present",
         desc: "Leading the frontend team in building scalable web applications using Next.js and React.",
     },
     {
-        company: "Creative Web Agency",
-        role: "Web Developer",
-        period: "2021 - 2023",
-        desc: "Developed responsive websites and e-commerce platforms for various clients.",
+        company: "Start Dropship",
+        role: "Web Developer Internship",
+        period: "May 2021 - Sep 2021",
+        desc: "Developed responsive websites and e-commerce platforms for clients.",
     },
 ];
 
 const EDUCATION = [
     {
         degree: "Bachelor of Technology in Computer Science",
-        institution: "State Technical University",
-        year: "2017 - 2021",
+        institution: "IIIT Ranchi",
+        year: "2018 - 2022",
         desc: "Focused on Software Engineering and Web Technologies. Graduated with Honors.",
     },
     {
-        degree: "Higher Secondary Certificate",
-        institution: "City High School",
+        degree: "intermediate (12th Grade)",
+        institution: "Gaya Evening College, Gaya",
         year: "2015 - 2017",
         desc: "Major in Physics, Chemistry, and Mathematics.",
+    },
+    {
+        degree: "Matriculation (10th Grade)",
+        institution: "High School Makhdumpur",
+        year: "2015",
+        desc: "Completed secondary education with a focus on Science and Mathematics.",
     },
 ];
 
@@ -105,23 +111,23 @@ const PROJECTS = [
     {
         name: "NFCBuzz.com",
         url: "https://nfcbuzz.com",
-        desc: "A comprehensive platform to explore NFC technology, tools, and use cases for modern web applications.",
+        desc: "A progressive web app where users can buy NFC business cards and access NFC tools easily using Web",
         logo: "/nfcbuzz.png",
         tags: ["Next.js", "Web NFC", "PWA"]
     },
     {
         name: "WebNfc.org",
         url: "https://webnfc.org",
-        desc: "Educational resource and documentation hub for the Web NFC API standards and implementation.",
+        desc: "Resource and documentation hub for the Web NFC API and Tools to use NFC in web applications.",
         logo: "/webnfc.jpg",
-        tags: ["React", "Documentation", "MDX"]
+        tags: ["React", "Documentation", "NFC Tools"]
     },
     {
         name: "KnowBihar.in",
         url: "https://knowbihar.in",
         desc: "A content-rich portal providing historical insights, tourism guides, and cultural information about Bihar.",
         logo: "/knowbihar.png",
-        tags: ["Next.js", "Content", "SEO"]
+        tags: ["Next.js", "Content", "SEO", "CMS"]
     },
     {
         name: "Vdev.in",
@@ -141,18 +147,39 @@ const PROJECTS = [
 
 const CERTIFICATIONS = [
     {
-        title: "Meta Frontend Developer",
-        issuer: "Coursera",
+        title: " ES6 Javascript: The Complete Developer's Guide ",
+        issuer: "Udemy",
         date: "2023",
-        url: "#",
-        desc: "Advanced React, UI/UX design, and frontend development best practices.",
+        url: "https://cognizant.udemy.com/certificate/UC-153a0f9c-a9ae-4bc5-a2dc-54d025b99930/",
+        desc: "Advanced JavaScript concepts including ES6 features, asynchronous programming, and modern development practices.",
     },
     {
-        title: "AWS Certified Cloud Practitioner",
-        issuer: "Amazon Web Services",
-        date: "2022",
-        url: "#",
+        title: "AWS Essentials",
+        issuer: "Amazon Web Services on Udemy",
+        date: "2023",
+        url: "https://cognizant.udemy.com/certificate/UC-2a3d0ce7-bd50-4770-a32b-b39934eb4ae3/",
         desc: "Fundamental understanding of AWS cloud platform and basic security concepts.",
+    },
+    {
+        title: "HTML, CSS, and Javascript for Web Developers",
+        issuer: "Coursera",
+        date: "2020",
+        url: "https://coursera.org/share/cb71721932bd9e74f6a1ef594e133e7b",
+        desc: "Comprehensive course covering the basics of web development using HTML, CSS, and JavaScript.",
+    },
+    {
+        title: "Google Cloud Fundamentals: Core Infrastructure",
+        issuer: "Coursera",
+        date: "2019",
+        url: "https://coursera.org/share/c946fcdf03dae2b50e1d3f976ce5c09b",
+        desc: "Introduction to Google Cloud Platform and its core infrastructure services.",
+    },
+    {
+        title: "Developing Applications with Google Cloud",
+        issuer: "Coursera",
+        date: "2019",
+        url: "https://coursera.org/share/6b5b58f33199b53dbeabeaaa7d034f9f",
+        desc: "Building and deploying applications on Google Cloud Platform using various services and tools.",
     },
 ];
 
