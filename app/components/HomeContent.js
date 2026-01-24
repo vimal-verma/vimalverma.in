@@ -273,9 +273,11 @@ const BlogCard = ({ blog }) => (
 export default function HomeContent() {
     const [isDark, setIsDark] = useState(true);
     const [formStatus, setFormStatus] = useState(null);
+    const [errors, setErrors] = useState({});
     const [blogs, setBlogs] = useState([]);
     const [loadingBlogs, setLoadingBlogs] = useState(true);
     const recommendationsRef = useRef(null);
+    const [typewriterText, setTypewriterText] = useState("Software Developer");
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -307,9 +309,24 @@ export default function HomeContent() {
         }
     };
 
+    const validateForm = (data) => {
+        const newErrors = {};
+        if (!data.name || data.name.trim().length < 2) {
+            newErrors.name = "Name must be at least 2 characters long.";
+        }
+        if (!data.email || !/^\S+@\S+\.\S+$/.test(data.email)) {
+            newErrors.email = "Please enter a valid email address.";
+        }
+        if (!data.message || data.message.trim().length < 10) {
+            newErrors.message = "Message must be at least 10 characters long.";
+        }
+        return newErrors;
+    };
+
     const handleContactSubmit = async (e) => {
         e.preventDefault();
         setFormStatus('submitting');
+        setErrors({});
 
         const formData = {
             name: e.target.name.value,
@@ -317,6 +334,13 @@ export default function HomeContent() {
             message: e.target.message.value,
             sendto: "vimal"
         };
+
+        const validationErrors = validateForm(formData);
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            setFormStatus(null);
+            return;
+        }
 
         try {
             const res = await fetch("https://api.vdev.in/message", {
@@ -394,6 +418,47 @@ export default function HomeContent() {
         return () => observer.disconnect();
     }, []);
 
+    useEffect(() => {
+        const roles = ["Software Developer", "Web App Creator", "Tech Enthusiast", "Open Source Contributor"];
+        let roleIndex = 0;
+        let charIndex = roles[0].length;
+        let isDeleting = false;
+        let timer;
+
+        const type = () => {
+            const currentRole = roles[roleIndex];
+
+            if (isDeleting) {
+                setTypewriterText(currentRole.substring(0, charIndex - 1));
+                charIndex--;
+            } else {
+                setTypewriterText(currentRole.substring(0, charIndex + 1));
+                charIndex++;
+            }
+
+            let speed = isDeleting ? 50 : 100;
+
+            if (!isDeleting && charIndex === currentRole.length) {
+                speed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                roleIndex = (roleIndex + 1) % roles.length;
+                speed = 500;
+            }
+
+            timer = setTimeout(type, speed);
+        };
+
+        // Start delay
+        timer = setTimeout(() => {
+            isDeleting = true;
+            type();
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     const scrollToTop = () => {
         window.scrollTo({
             top: 0,
@@ -428,11 +493,30 @@ export default function HomeContent() {
                         <span className={styles.gradientText}>Vimal Kumar</span> <span className={styles.handle}>(VimalVerma)</span>
                     </h1>
                     <p className={`${styles.subtitle} ${styles.animateFadeUp} ${styles.delay2}`}>
-                        Software Developer | Web App Creator
+                        I am a <span style={{ color: "var(--accent-color, #00F2FF)", fontWeight: "600" }}>{typewriterText}</span>
+                        <span style={{ animation: "blink 1s step-end infinite", opacity: 0.7 }}>|</span>
+                        <style>{`@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`}</style>
                     </p>
                     <p className={`${styles.description} ${styles.animateFadeUp} ${styles.delay3}`}>
                         I love to build digital solutions that make a difference. Love exploring new technologies and turning ideas into reality through code.
                     </p>
+
+                    <div className={`${styles.animateFadeUp} ${styles.delay3}`} style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", margin: "1.5rem 0" }}>
+                        {["React", "Next.js", "Node.js", "AWS", "NFC"].map((tech) => (
+                            <span key={tech} style={{
+                                padding: "6px 16px",
+                                borderRadius: "20px",
+                                backgroundColor: isDark ? "rgba(0, 242, 255, 0.1)" : "rgba(0, 242, 255, 0.05)",
+                                color: "var(--accent-color, #00F2FF)",
+                                border: "1px solid rgba(0, 242, 255, 0.2)",
+                                fontSize: "0.85rem",
+                                fontWeight: "500",
+                                backdropFilter: "blur(5px)"
+                            }}>
+                                {tech}
+                            </span>
+                        ))}
+                    </div>
 
                     <div className={`${styles.heroButtons} ${styles.animateFadeUp} ${styles.delay3}`}>
                         <a
@@ -676,14 +760,17 @@ export default function HomeContent() {
                             <div className={styles.formGroup} >
                                 <label htmlFor="name" className={styles.formLabel} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}><User size={16} /> Name</label>
                                 <input type="text" id="name" name="name" required className={styles.formInput} placeholder="Your Name" data-narrate="Enter your name here." data-section="Contact" />
+                                {errors.name && <span style={{ color: "#FF4444", fontSize: "0.8rem", marginTop: "0.25rem", display: "block" }}>{errors.name}</span>}
                             </div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="email" className={styles.formLabel} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}><Mail size={16} /> Email</label>
                                 <input type="email" id="email" name="email" required className={styles.formInput} placeholder="your@email.com" data-narrate="Enter your email address so Vimal can reply." data-section="Contact" />
+                                {errors.email && <span style={{ color: "#FF4444", fontSize: "0.8rem", marginTop: "0.25rem", display: "block" }}>{errors.email}</span>}
                             </div>
                             <div className={styles.formGroup}>
                                 <label htmlFor="message" className={styles.formLabel} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}><MessageSquare size={16} /> Message</label>
                                 <textarea id="message" name="message" required rows="5" className={styles.formTextarea} placeholder="Your Message" data-narrate="Type your message or project details here." data-section="Contact"></textarea>
+                                {errors.message && <span style={{ color: "#FF4444", fontSize: "0.8rem", marginTop: "0.25rem", display: "block" }}>{errors.message}</span>}
                             </div>
                             <button type="submit" className={styles.submitBtn} disabled={formStatus === 'submitting' || formStatus === 'success'} aria-live="polite" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
                                 {formStatus === 'submitting' ? 'Sending...' : (formStatus === 'success' ? 'Message Sent!' : <><Send size={18} /> Send Message</>)}
