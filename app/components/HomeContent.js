@@ -5,6 +5,7 @@ import styles from "../page.module.css";
 import Header from "./Header";
 import Footer from "./Footer";
 import RobotGuide from "./RobotGuide";
+import HeroBackground from "./HeroBackground";
 import {
     Download,
     ExternalLink,
@@ -509,6 +510,7 @@ export default function HomeContent() {
             <RobotGuide isDark={isDark} />
             <Header isDark={isDark} toggleTheme={toggleTheme} />
             <main className={styles.main}>
+                <HeroBackground isDark={isDark} />
                 <section id="introduction" className={styles.hero} data-narrate="Welcome! I am Vimal's virtual assistant. Let me introduce you to Vimal, a passionate Software Developer and Web App Creator." data-section="Introduction">
                     <div className={`${styles.statusBadge} ${styles.animateFadeUp} ${styles.delay1}`}>
                         <span className={styles.statusDot}></span>
