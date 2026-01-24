@@ -507,7 +507,7 @@ export default function HomeContent() {
         <div className={`${styles.page} ${isDark ? styles.darkMode : ""}`}>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }} />
             <div className={styles.progressBar} style={{ width: `${scrollProgress}%` }} />
-            <RobotGuide isDark={isDark} />
+            <RobotGuide isDark={isDark} toggleTheme={toggleTheme} />
             <Header isDark={isDark} toggleTheme={toggleTheme} />
             <main className={styles.main}>
                 <HeroBackground isDark={isDark} />

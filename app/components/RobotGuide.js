@@ -64,6 +64,30 @@ const Mouth = ({ expression, color = "#00F2FF" }) => {
     return <path id="Vector_9" d="M70.5 94.5C73.8137 94.5 76.5 91.814 76.5 88.5C76.5 85.186 73.8137 82.5 70.5 82.5C67.1863 82.5 64.5 85.186 64.5 88.5C64.5 91.814 67.1863 94.5 70.5 94.5Z" stroke={color} strokeWidth="2" />;
 };
 
+const Typewriter = ({ text, animate, onComplete }) => {
+    const [display, setDisplay] = useState(animate ? "" : text);
+
+    useEffect(() => {
+        if (!animate) {
+            setDisplay(text);
+            return;
+        }
+        let i = 0;
+        const timer = setInterval(() => {
+            if (i < text.length) {
+                setDisplay(text.substring(0, i + 1));
+                i++;
+            } else {
+                clearInterval(timer);
+                if (onComplete) onComplete();
+            }
+        }, 20);
+        return () => clearInterval(timer);
+    }, [animate, text]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    return <span>{display}</span>;
+};
+
 const SECTION_CONTAINER_IDS = [
     "introduction",
     "projects",
@@ -199,7 +223,7 @@ const RobotIcon = ({ expression, isSpeaking, isDark, onRobotClick, onRobotDouble
     );
 };
 
-export default function RobotGuide({ isDark }) {
+export default function RobotGuide({ isDark, toggleTheme }) {
     const containerRef = useRef(null);
     const currentUtteranceRef = useRef(null);
     const visitedSections = useRef(new Set());
@@ -251,6 +275,18 @@ export default function RobotGuide({ isDark }) {
     const isIntroModeRef = useRef(false);
     const [robotSize, setRobotSize] = useState(100);
     const [robotColor, setRobotColor] = useState("#00F2FF");
+    const [showTerminal, setShowTerminal] = useState(false);
+    const [terminalInput, setTerminalInput] = useState("");
+    const [terminalHistory, setTerminalHistory] = useState([
+        { type: 'output', content: "Welcome to Vimal's Assistant v1.0", id: 1 },
+        { type: 'output', content: "Type 'help' to see available commands.", id: 2 }
+    ]);
+    const terminalEndRef = useRef(null);
+    const lastAnimatedIdRef = useRef(2);
+    const [terminalPos, setTerminalPos] = useState(null);
+    const terminalDragOffsetRef = useRef({ x: 0, y: 0 });
+    const [terminalSize, setTerminalSize] = useState({ width: 600, height: 400 });
+    const resizeStartRef = useRef({ x: 0, y: 0, w: 0, h: 0 });
 
     useEffect(() => {
         const handleResize = () => {
@@ -259,6 +295,25 @@ export default function RobotGuide({ isDark }) {
         handleResize();
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    useEffect(() => {
+        if (showTerminal) {
+            terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [terminalHistory, showTerminal]);
+
+    useEffect(() => {
+        if (!showTerminal) {
+            setTerminalPos(null);
+        }
+    }, [showTerminal]);
+
+    useEffect(() => {
+        setTerminalSize({
+            width: Math.min(window.innerWidth * 0.9, 600),
+            height: 400
+        });
     }, []);
 
     const stopSpeaking = () => {
@@ -844,20 +899,156 @@ export default function RobotGuide({ isDark }) {
 
     const handleRobotClick = () => {
         if (isDraggingRef.current) return;
-        if (!isSpinning && !isDancing) {
-            setIsDancing(true);
-            const jokes = [
-                "Why do programmers prefer dark mode? Because light attracts bugs.",
-                "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
-                "I would tell you a UDP joke, but you might not get it.",
-                "Why did the developer go broke? Because he used up all his cache.",
-                "A SQL query walks into a bar, walks up to two tables and asks, 'Can I join you?'"
-            ];
-            const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
-            setExpression("excited");
-            speak(randomJoke);
-            setTimeout(() => setIsDancing(false), 250);
+        setShowTerminal(true);
+    };
+
+    const handleTerminalMouseDown = (e) => {
+        if (e.target.closest('button')) return;
+        e.preventDefault();
+        const terminal = e.currentTarget.closest('[role="dialog"]');
+        if (!terminal) return;
+
+        const rect = terminal.getBoundingClientRect();
+        terminalDragOffsetRef.current = {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+
+        if (!terminalPos) {
+            setTerminalPos({ x: rect.left, y: rect.top });
         }
+
+        const handleMouseMove = (moveEvent) => {
+            setTerminalPos({
+                x: moveEvent.clientX - terminalDragOffsetRef.current.x,
+                y: moveEvent.clientY - terminalDragOffsetRef.current.y
+            });
+        };
+
+        const handleMouseUp = () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
+        };
+
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+    };
+
+    const handleResizeMouseDown = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!terminalPos) {
+            const terminal = e.target.closest('[role="dialog"]');
+            if (terminal) {
+                const rect = terminal.getBoundingClientRect();
+                setTerminalPos({ x: rect.left, y: rect.top });
+            }
+        }
+
+        resizeStartRef.current = {
+            x: e.clientX,
+            y: e.clientY,
+            w: terminalSize.width,
+            h: terminalSize.height
+        };
+
+        const handleMouseMove = (moveEvent) => {
+            const dx = moveEvent.clientX - resizeStartRef.current.x;
+            const dy = moveEvent.clientY - resizeStartRef.current.y;
+
+            setTerminalSize({
+                width: Math.max(300, resizeStartRef.current.w + dx),
+                height: Math.max(200, resizeStartRef.current.h + dy)
+            });
+        };
+
+        const handleMouseUp = () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
+        };
+
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+    };
+
+    const handleCommand = (e) => {
+        e.preventDefault();
+        const cmd = terminalInput.trim().toLowerCase();
+        if (!cmd) return;
+
+        const inputId = Date.now();
+        const newHistory = [...terminalHistory, { type: 'input', content: cmd, id: inputId }];
+        let response = "";
+
+        switch (cmd) {
+            case "help":
+                response = "Available commands: help, resume, about, projects, skills, experience, contact, joke, theme, time, clear, exit";
+                break;
+            case "resume":
+                response = "Opening resume...";
+                window.open("/resume.pdf", "_blank");
+                break;
+            case "about":
+            case "projects":
+            case "skills":
+            case "experience":
+            case "education":
+            case "certifications":
+            case "blog":
+            case "contact":
+            case "recommendations":
+                const section = document.getElementById(cmd);
+                if (section) {
+                    section.scrollIntoView({ behavior: "smooth" });
+                    response = `Navigating to ${cmd} section...`;
+                    setExpression("excited");
+                } else {
+                    response = `Section '${cmd}' not found.`;
+                }
+                break;
+            case "theme":
+                if (toggleTheme) {
+                    toggleTheme();
+                    response = `Switched to ${!isDark ? "dark" : "light"} mode.`;
+                    setExpression("happy");
+                } else {
+                    response = "Theme toggling is not available.";
+                    setExpression("confused");
+                }
+                break;
+            case "time":
+                response = `Current time is: ${new Date().toLocaleTimeString()}`;
+                setExpression("happy");
+                break;
+            case "joke":
+                const jokes = [
+                    "Why do programmers prefer dark mode? Because light attracts bugs.",
+                    "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
+                    "I would tell you a UDP joke, but you might not get it.",
+                    "Why did the developer go broke? Because he used up all his cache.",
+                    "A SQL query walks into a bar, walks up to two tables and asks, 'Can I join you?'"
+                ];
+                const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+                response = randomJoke;
+                speak(randomJoke);
+                setExpression("happy");
+                break;
+            case "clear":
+                setTerminalHistory([]);
+                setTerminalInput("");
+                return;
+            case "exit":
+                setShowTerminal(false);
+                setTerminalInput("");
+                return;
+            default:
+                response = `Command not found: ${cmd}. Type 'help' for assistance.`;
+                setExpression("confused");
+        }
+        const outputId = Date.now() + 10;
+        setTerminalHistory([...newHistory, { type: 'output', content: response, id: outputId }]);
+        setTerminalInput("");
     };
 
     const handleRobotDoubleClick = (e) => {
@@ -1016,6 +1207,86 @@ export default function RobotGuide({ isDark }) {
                         }}>⚡</div>
                     ))}
                 </>
+            )}
+            {showTerminal && (
+                <div role="dialog" style={{
+                    position: "fixed",
+                    top: terminalPos ? `${terminalPos.y}px` : "50%",
+                    left: terminalPos ? `${terminalPos.x}px` : "50%",
+                    transform: terminalPos ? "none" : "translate(-50%, -50%)",
+                    width: `${terminalSize.width}px`,
+                    height: `${terminalSize.height}px`,
+                    backgroundColor: "rgba(15, 15, 20, 0.95)",
+                    backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(0, 242, 255, 0.3)",
+                    borderRadius: "10px",
+                    boxShadow: "0 0 30px rgba(0, 242, 255, 0.2)",
+                    zIndex: 3000,
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                    fontFamily: "'Courier New', Courier, monospace"
+                }}>
+                    <div
+                        onMouseDown={handleTerminalMouseDown}
+                        style={{
+                            padding: "10px 15px",
+                            background: "rgba(0, 242, 255, 0.1)",
+                            borderBottom: "1px solid rgba(0, 242, 255, 0.2)",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            color: "#00F2FF",
+                            cursor: "move"
+                        }}>
+                        <span style={{ fontWeight: "bold", fontSize: "14px" }}>TERMINAL_ACCESS</span>
+                        <button onClick={() => setShowTerminal(false)} style={{ background: "none", border: "none", color: "#FF4444", cursor: "pointer", fontSize: "16px", padding: "0 5px" }}>✕</button>
+                    </div>
+                    <div style={{
+                        flex: 1,
+                        padding: "15px",
+                        overflowY: "auto",
+                        color: "#e0e0e0",
+                        fontSize: "14px",
+                        lineHeight: "1.5"
+                    }} onClick={() => document.getElementById("terminal-input")?.focus()}>
+                        {terminalHistory.map((line) => (
+                            <div key={line.id} style={{ marginBottom: "5px", color: line.type === 'input' ? '#aaa' : '#00F2FF' }}>
+                                {line.type === 'input' ? '> ' : ''}
+                                <Typewriter 
+                                    text={line.content} 
+                                    animate={line.type === 'output' && line.id > lastAnimatedIdRef.current}
+                                    onComplete={() => { lastAnimatedIdRef.current = Math.max(lastAnimatedIdRef.current, line.id); }}
+                                />
+                            </div>
+                        ))}
+                        <div ref={terminalEndRef} />
+                    </div>
+                    <form onSubmit={handleCommand} style={{
+                        padding: "10px 15px",
+                        borderTop: "1px solid rgba(0, 242, 255, 0.2)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                        background: "rgba(0,0,0,0.3)"
+                    }}>
+                        <span style={{ color: "#00F2FF" }}>$</span>
+                        <input id="terminal-input" type="text" value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} autoFocus autoComplete="off" style={{ flex: 1, background: "none", border: "none", color: "#fff", fontFamily: "inherit", fontSize: "14px", outline: "none" }} placeholder="Type command..." />
+                    </form>
+                    <div
+                        onMouseDown={handleResizeMouseDown}
+                        style={{
+                            position: "absolute",
+                            bottom: 0,
+                            right: 0,
+                            width: "15px",
+                            height: "15px",
+                            cursor: "nwse-resize",
+                            zIndex: 10,
+                            background: "linear-gradient(135deg, transparent 50%, rgba(0, 242, 255, 0.5) 50%)"
+                        }}
+                    />
+                </div>
             )}
             {hearts.map(h => (
                 <div key={h.id} className={styles.heart} style={{
