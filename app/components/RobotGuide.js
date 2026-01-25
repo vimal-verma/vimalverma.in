@@ -1375,6 +1375,17 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                     </div>
 
                     <div className={styles.settingItem}>
+                        <span>Terminal</span>
+                        <button
+                            className={styles.settingBtn}
+                            onClick={() => { if (showTerminal) setShowTerminal(false); else setShowTerminal(true); }}
+                            style={{ color: isIntroMode ? "#FF4444" : "#00F2FF", fontWeight: "bold" }}
+                        >
+                            {showTerminal ? "STOP" : "START"}
+                        </button>
+                    </div>
+
+                    <div className={styles.settingItem}>
                         <span>Sound Effects</span>
                         <button
                             className={styles.settingBtn}

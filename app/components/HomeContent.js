@@ -532,7 +532,7 @@ export default function HomeContent() {
                     </p>
 
                     <div className={`${styles.animateFadeUp} ${styles.delay3}`} style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", margin: "1.5rem 0" }}>
-                        {["React", "Next.js", "Node.js", "AWS", "NFC"].map((tech) => (
+                        {["React", "Next.js", "Node.js", "GCP", "NFC"].map((tech) => (
                             <span key={tech} style={{
                                 padding: "6px 16px",
                                 borderRadius: "20px",
