@@ -64,28 +64,41 @@ const Mouth = ({ expression, color = "#00F2FF" }) => {
     return <path id="Vector_9" d="M70.5 94.5C73.8137 94.5 76.5 91.814 76.5 88.5C76.5 85.186 73.8137 82.5 70.5 82.5C67.1863 82.5 64.5 85.186 64.5 88.5C64.5 91.814 67.1863 94.5 70.5 94.5Z" stroke={color} strokeWidth="2" />;
 };
 
-const Typewriter = ({ text, animate, onComplete }) => {
+const Typewriter = ({ text, animate, onComplete, scrollToBottom }) => {
     const [display, setDisplay] = useState(animate ? "" : text);
+    const [showCursor, setShowCursor] = useState(animate);
 
     useEffect(() => {
         if (!animate) {
             setDisplay(text);
+            setShowCursor(false);
             return;
         }
+        setShowCursor(true);
         let i = 0;
+        const speed = text.length > 100 ? 5 : 30;
         const timer = setInterval(() => {
             if (i < text.length) {
                 setDisplay(text.substring(0, i + 1));
                 i++;
+                if (scrollToBottom) scrollToBottom();
             } else {
                 clearInterval(timer);
+                setShowCursor(false);
                 if (onComplete) onComplete();
+                if (scrollToBottom) scrollToBottom();
             }
-        }, 20);
+        }, speed);
         return () => clearInterval(timer);
     }, [animate, text]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    return <span>{display}</span>;
+    return (
+        <span style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+            {display}
+            {showCursor && <span style={{ display: "inline-block", width: "8px", height: "14px", backgroundColor: "#00F2FF", verticalAlign: "middle", marginLeft: "2px", animation: "blink 1s step-end infinite" }}></span>}
+            <style>{`@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`}</style>
+        </span>
+    );
 };
 
 const SECTION_CONTAINER_IDS = [
@@ -305,6 +318,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
     const [terminalMode, setTerminalMode] = useState('command');
     const [terminalFormData, setTerminalFormData] = useState({ name: "", email: "", message: "" });
     const [historyPointer, setHistoryPointer] = useState(null);
+    const [isTerminalFullScreen, setIsTerminalFullScreen] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -327,6 +341,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
             setTerminalMode('command');
             setTerminalFormData({ name: "", email: "", message: "" });
             setHistoryPointer(null);
+            setIsTerminalFullScreen(false);
         }
     }, [showTerminal]);
 
@@ -950,6 +965,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
     };
 
     const handleTerminalMouseDown = (e) => {
+        if (isTerminalFullScreen) return;
         if (e.target.closest('button')) return;
         e.preventDefault();
         const terminal = e.currentTarget.closest('[role="dialog"]');
@@ -1167,9 +1183,15 @@ export default function RobotGuide({ isDark, toggleTheme }) {
             case "recommendations":
                 const section = document.getElementById(cmd);
                 if (section) {
-                    section.scrollIntoView({ behavior: "smooth" });
-                    response = `Navigating to ${cmd} section...`;
-                    setExpression("excited");
+                    if (isTerminalFullScreen) {
+                        const content = section.innerText.replace(/\n\s*\n/g, '\n\n');
+                        response = `--- ${cmd.toUpperCase()} ---\n\n${content}`;
+                        setExpression("excited");
+                    } else {
+                        section.scrollIntoView({ behavior: "smooth" });
+                        response = `Navigating to ${cmd} section...`;
+                        setExpression("excited");
+                    }
                 } else {
                     response = `Section '${cmd}' not found.`;
                 }
@@ -1423,15 +1445,15 @@ export default function RobotGuide({ isDark, toggleTheme }) {
             {showTerminal && (
                 <div role="dialog" style={{
                     position: "fixed",
-                    top: terminalPos ? `${terminalPos.y}px` : "50%",
-                    left: terminalPos ? `${terminalPos.x}px` : "50%",
-                    transform: terminalPos ? "none" : "translate(-50%, -50%)",
-                    width: `${terminalSize.width}px`,
-                    height: `${terminalSize.height}px`,
+                    top: isTerminalFullScreen ? "0" : (terminalPos ? `${terminalPos.y}px` : "50%"),
+                    left: isTerminalFullScreen ? "0" : (terminalPos ? `${terminalPos.x}px` : "50%"),
+                    transform: isTerminalFullScreen ? "none" : (terminalPos ? "none" : "translate(-50%, -50%)"),
+                    width: isTerminalFullScreen ? "100%" : `${terminalSize.width}px`,
+                    height: isTerminalFullScreen ? "100%" : `${terminalSize.height}px`,
                     backgroundColor: "rgba(15, 15, 20, 0.95)",
                     backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(0, 242, 255, 0.3)",
-                    borderRadius: "10px",
+                    border: isTerminalFullScreen ? "none" : "1px solid rgba(0, 242, 255, 0.3)",
+                    borderRadius: isTerminalFullScreen ? "0" : "10px",
                     boxShadow: "0 0 30px rgba(0, 242, 255, 0.2)",
                     zIndex: 3000,
                     display: "flex",
@@ -1452,7 +1474,10 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                             cursor: "move"
                         }}>
                         <span style={{ fontWeight: "bold", fontSize: "14px" }}>TERMINAL_ACCESS</span>
-                        <button onClick={() => setShowTerminal(false)} style={{ background: "none", border: "none", color: "#FF4444", cursor: "pointer", fontSize: "16px", padding: "0 5px" }}>✕</button>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <button onClick={() => setIsTerminalFullScreen(!isTerminalFullScreen)} style={{ background: "none", border: "none", color: "#00F2FF", cursor: "pointer", fontSize: "16px", padding: "0 5px" }} title={isTerminalFullScreen ? "Restore" : "Maximize"}>{isTerminalFullScreen ? "❐" : "□"}</button>
+                            <button onClick={() => setShowTerminal(false)} style={{ background: "none", border: "none", color: "#FF4444", cursor: "pointer", fontSize: "16px", padding: "0 5px" }}>✕</button>
+                        </div>
                     </div>
                     <div style={{
                         flex: 1,
@@ -1469,6 +1494,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                                     text={line.content}
                                     animate={line.type === 'output' && line.id > lastAnimatedIdRef.current}
                                     onComplete={() => { lastAnimatedIdRef.current = Math.max(lastAnimatedIdRef.current, line.id); }}
+                                    scrollToBottom={() => terminalEndRef.current?.scrollIntoView({ behavior: "auto", block: "nearest" })}
                                 />
                             </div>
                         ))}
@@ -1488,6 +1514,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                     <div
                         onMouseDown={handleResizeMouseDown}
                         style={{
+                            display: isTerminalFullScreen ? "none" : "block",
                             position: "absolute",
                             bottom: 0,
                             right: 0,
