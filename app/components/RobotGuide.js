@@ -305,10 +305,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
     const [robotColor, setRobotColor] = useState("#00F2FF");
     const [showTerminal, setShowTerminal] = useState(false);
     const [terminalInput, setTerminalInput] = useState("");
-    const [terminalHistory, setTerminalHistory] = useState([
-        { type: 'output', content: "Welcome to Vimal's Assistant v1.0", id: 1 },
-        { type: 'output', content: "Type 'help' to see available commands.", id: 2 }
-    ]);
+    const [terminalHistory, setTerminalHistory] = useState([]);
     const terminalEndRef = useRef(null);
     const lastAnimatedIdRef = useRef(2);
     const [terminalPos, setTerminalPos] = useState(null);
@@ -319,6 +316,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
     const [terminalFormData, setTerminalFormData] = useState({ name: "", email: "", message: "" });
     const [historyPointer, setHistoryPointer] = useState(null);
     const [isTerminalFullScreen, setIsTerminalFullScreen] = useState(false);
+    const [isBooting, setIsBooting] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -336,12 +334,34 @@ export default function RobotGuide({ isDark, toggleTheme }) {
     }, [terminalHistory, showTerminal]);
 
     useEffect(() => {
-        if (!showTerminal) {
+        if (showTerminal) {
+            setIsBooting(true);
+            setTerminalHistory([]);
+
+            const bootSequence = [
+                { text: "Initializing VimalOS kernel...", delay: 100 },
+                { text: "Loading system modules... [OK]", delay: 800 },
+                { text: "Verifying user permissions... [OK]", delay: 1600 },
+                { text: "Establishing secure connection... [Connected]", delay: 2400 },
+                { text: "Welcome to Vimal's Assistant v1.0", delay: 3200 },
+                { text: "Type 'help' to see available commands.", delay: 4000 }
+            ];
+
+            const timeouts = bootSequence.map((step, index) =>
+                setTimeout(() => {
+                    setTerminalHistory(prev => [...prev, { type: 'output', content: step.text, id: Date.now() + index }]);
+                    if (index === bootSequence.length - 1) setIsBooting(false);
+                }, step.delay)
+            );
+            return () => timeouts.forEach(clearTimeout);
+        } else {
             setTerminalPos(null);
             setTerminalMode('command');
             setTerminalFormData({ name: "", email: "", message: "" });
             setHistoryPointer(null);
             setIsTerminalFullScreen(false);
+            setIsBooting(false);
+            setTerminalHistory([]);
         }
     }, [showTerminal]);
 
@@ -1166,7 +1186,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
 
         switch (cmd) {
             case "help":
-                response = "Available commands: help, resume, about, projects, skills, experience, contact, joke, theme, time, game, guide, stop, message, robot, clear, exit";
+                response = "Available commands: help, resume, about, projects, skills, experience, contact, joke, theme, time, game, guide, stop, message, robot, clear, exit\n\nShortcuts:\n[Tab]     Autocomplete command\n[Up/Down] Navigate history";
                 break;
             case "resume":
                 response = "Opening resume...";
@@ -1450,8 +1470,8 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                     transform: isTerminalFullScreen ? "none" : (terminalPos ? "none" : "translate(-50%, -50%)"),
                     width: isTerminalFullScreen ? "100%" : `${terminalSize.width}px`,
                     height: isTerminalFullScreen ? "100%" : `${terminalSize.height}px`,
-                    backgroundColor: "rgba(15, 15, 20, 0.95)",
-                    backdropFilter: "blur(10px)",
+                    backgroundColor: isTerminalFullScreen ? "#0c0c0c" : "rgba(15, 15, 20, 0.95)",
+                    backdropFilter: isTerminalFullScreen ? "none" : "blur(10px)",
                     border: isTerminalFullScreen ? "none" : "1px solid rgba(0, 242, 255, 0.3)",
                     borderRadius: isTerminalFullScreen ? "0" : "10px",
                     boxShadow: "0 0 30px rgba(0, 242, 255, 0.2)",
@@ -1459,7 +1479,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                     display: "flex",
                     flexDirection: "column",
                     overflow: "hidden",
-                    fontFamily: "'Courier New', Courier, monospace"
+                    fontFamily: isTerminalFullScreen ? "'Consolas', 'Monaco', 'Courier New', monospace" : "'Courier New', Courier, monospace"
                 }}>
                     <div
                         onMouseDown={handleTerminalMouseDown}
@@ -1489,7 +1509,7 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                     }} onClick={() => document.getElementById("terminal-input")?.focus()}>
                         {terminalHistory.map((line) => (
                             <div key={line.id} style={{ marginBottom: "5px", color: line.type === 'input' ? '#aaa' : '#00F2FF' }}>
-                                {line.type === 'input' ? '> ' : ''}
+                                {line.type === 'input' ? (isTerminalFullScreen ? 'guest@vimal:~$ ' : '> ') : ''}
                                 <Typewriter
                                     text={line.content}
                                     animate={line.type === 'output' && line.id > lastAnimatedIdRef.current}
@@ -1500,17 +1520,19 @@ export default function RobotGuide({ isDark, toggleTheme }) {
                         ))}
                         <div ref={terminalEndRef} />
                     </div>
-                    <form onSubmit={handleCommand} style={{
-                        padding: "10px 15px",
-                        borderTop: "1px solid rgba(0, 242, 255, 0.2)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "10px",
-                        background: "rgba(0,0,0,0.3)"
-                    }}>
-                        <span style={{ color: "#00F2FF" }}>$</span>
-                        <input id="terminal-input" type="text" value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} onKeyDown={handleTerminalKeyDown} autoFocus autoComplete="off" style={{ flex: 1, background: "none", border: "none", color: "#fff", fontFamily: "inherit", fontSize: "14px", outline: "none" }} placeholder="Type command..." />
-                    </form>
+                    {!isBooting && (
+                        <form onSubmit={handleCommand} style={{
+                            padding: "10px 15px",
+                            borderTop: "1px solid rgba(0, 242, 255, 0.2)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            background: "rgba(0,0,0,0.3)"
+                        }}>
+                            <span style={{ color: "#00F2FF" }}>{isTerminalFullScreen ? "guest@vimal:~$" : "$"}</span>
+                            <input id="terminal-input" type="text" value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} onKeyDown={handleTerminalKeyDown} autoFocus autoComplete="off" style={{ flex: 1, background: "none", border: "none", color: "#fff", fontFamily: "inherit", fontSize: "14px", outline: "none" }} placeholder="Type command..." />
+                        </form>
+                    )}
                     <div
                         onMouseDown={handleResizeMouseDown}
                         style={{

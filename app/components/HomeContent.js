@@ -42,7 +42,8 @@ const SKILL_CATEGORIES = [
             "Next.js",
             "JavaScript",
             "HTML5 & CSS3",
-            "Tailwind CSS"
+            "Tailwind CSS",
+            "SVG",
         ]
     },
     {
@@ -77,7 +78,7 @@ const EXPERIENCE = [
         company: "Cognizant",
         role: "Developer",
         period: "2022 - Present",
-        desc: "Leading the frontend team in building scalable web applications using Next.js and React.",
+        desc: "Involved in developing and maintaining web applications using modern frameworks and technologies.",
     },
     {
         company: "Start Dropship",
