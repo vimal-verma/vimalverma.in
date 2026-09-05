@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "deploy": "next build && npx surge out --domain vimal.surge.sh",
     "lint": "eslint"
   },
   "dependencies": {
