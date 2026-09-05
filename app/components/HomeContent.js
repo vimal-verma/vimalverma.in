@@ -118,10 +118,10 @@ const PROJECTS = [
         tags: ["Next.js", "Web NFC", "PWA"]
     },
     {
-        name: "WebNfc.org",
-        url: "https://webnfc.org",
+        name: "NFCTool.org",
+        url: "https://nfctool.org",
         desc: "Resource and documentation hub for the Web NFC API and Tools to use NFC in web applications.",
-        logo: "/webnfc.jpg",
+        logo: "/nfctool.jpg",
         tags: ["React", "Documentation", "NFC Tools"]
     },
     {
@@ -208,7 +208,7 @@ const JSON_LD = {
     "@type": "Person",
     "name": "Vimal Kumar",
     "alternateName": "VimalVerma",
-    "url": "https://vimalverma.in",
+    "url": "https://www.vimalverma.in",
     "jobTitle": "Software Developer",
     "knowsAbout": SKILL_CATEGORIES.flatMap(cat => cat.items),
     "description": "Software Developer and Web App Creator specializing in React, Next.js, and NFC technology.",

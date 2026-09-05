@@ -1,8 +1,10 @@
+export const dynamic = "force-static";
+
 export default function manifest() {
     return {
         name: 'Vimal Kumar Portfolio',
         short_name: 'VimalVerma',
-        description: 'Personal portfolio of Vimal Kumar showcasing skills in JavaScript, React, Next.js, and projects like NFCBuzz and WebNfc.',
+        description: 'Personal portfolio of Vimal Kumar showcasing skills in JavaScript, React, Next.js, and projects like NFCBuzz and NFCTool.',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',

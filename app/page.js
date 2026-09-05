@@ -7,7 +7,7 @@ export const metadata = {
   openGraph: {
     title: "Vimal Kumar - Software Developer",
     description: "Building digital solutions with React and Next.js. Explore my portfolio for projects and insights.",
-    url: "https://vimalverma.in",
+    url: "https://www.vimalverma.in",
     siteName: "Vimal Kumar Portfolio",
     images: [
       {
@@ -28,7 +28,7 @@ export const metadata = {
     images: ["/profile.jpg"],
   },
   alternates: {
-    canonical: "https://vimalverma.in",
+    canonical: "https://www.vimalverma.in",
   },
   robots: {
     index: true,
@@ -42,8 +42,8 @@ export default function Home() {
     "@type": "Person",
     name: "Vimal Kumar",
     alternateName: "VimalVerma",
-    url: "https://vimalverma.in",
-    image: "https://vimalverma.in/profile.jpg",
+    url: "https://www.vimalverma.in",
+    image: "https://www.vimalverma.in/profile.jpg",
     sameAs: ["https://twitter.com/vimalverma_in"],
     jobTitle: "Software Developer",
     description:

@@ -12,14 +12,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  metadataBase: new URL("https://vimalverma.in"),
+  metadataBase: new URL("https://www.vimalverma.in"),
   title: {
     default: "Vimal Kumar (VimalVerma) - Software Developer & Web App Creator",
     template: "%s | Vimal Kumar",
   },
-  description: "Personal portfolio of Vimal Kumar showcasing skills in JavaScript, React, Next.js, and projects like NFCBuzz and WebNfc.",
+  description: "Personal portfolio of Vimal Kumar showcasing skills in JavaScript, React, Next.js, and projects like NFCBuzz and NFCTool.",
   keywords: ["Vimal Kumar", "VimalVerma", "Software Developer", "Web App Creator", "React", "Next.js", "NFC Technology", "Portfolio"],
-  authors: [{ name: "Vimal Kumar", url: "https://vimalverma.in" }],
+  authors: [{ name: "Vimal Kumar", url: "https://www.vimalverma.in" }],
   creator: "Vimal Kumar",
   publisher: "Vimal Kumar",
   formatDetection: {
@@ -39,12 +39,12 @@ export const metadata = {
     },
   },
   alternates: {
-    canonical: "https://vimalverma.in",
+    canonical: "https://www.vimalverma.in",
   },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://vimalverma.in",
+    url: "https://www.vimalverma.in",
     title: "Vimal Kumar - Software Developer & Web App Creator",
     description: "Explore the projects and skills of Vimal Kumar.",
     siteName: "VimalVerma Portfolio",
